@@ -1,0 +1,4 @@
+Token value : cfat_JPUakuDBVanCO02c1A2mXxLgpyt7kbo1p6E4gIrB48e130e1
+Acsess key ıd : 3f35ba1ecd206e76b731ca01f6ed4641
+secret access : 1abfce8dfc6a8e4e9618fdb96b386ea38921ff2f4282afabe3a4307195feb202
+s3 client : https://120c3a085639135bfcd04cf1c007cd93.r2.cloudflarestorage.com 

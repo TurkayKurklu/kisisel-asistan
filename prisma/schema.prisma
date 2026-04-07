@@ -1,0 +1,63 @@
+generator client {
+  provider   = "prisma-client-js"
+  engineType = "library"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Task {
+  id          String   @id @default(cuid())
+  title       String?
+  content     String
+  topic       String?
+  date        DateTime
+  dueDate     DateTime?
+  time        String?  // HH:mm format
+  priority    String   @default("low") // low, medium, high
+  isCompleted Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Note {
+  id        String   @id @default(cuid())
+  title     String
+  content   String   @db.Text
+  image     String?  // Base64 veya URL
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Transaction {
+  id          String   @id @default(cuid())
+  title       String?
+  amount      Float
+  description String
+  category    String
+  type        String   // "INCOME" or "EXPENSE"
+  note        String?
+  date        DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Event {
+  id        String   @id @default(cuid())
+  title     String
+  date      DateTime
+  time      String?
+  category  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Habit {
+  id                 String    @id @default(cuid())
+  title              String
+  streak             Int       @default(0)
+  lastCompletedDate  DateTime?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+}

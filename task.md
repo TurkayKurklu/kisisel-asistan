@@ -1,0 +1,30 @@
+# Dashboard Transformation Tasks
+
+- [x] **Database Setup**
+    - [x] Update `prisma/schema.prisma` with new models (`Event`, `Habit`) and extensions (`Task`, `Transaction`).
+    - [x] Run `npx prisma generate` and `npx prisma db push`.
+- [x] **Core Layout & Navigation**
+    - [x] Create `src/app/(dashboard)/layout.tsx` (DashboardLayout).
+    - [x] Create `src/components/Sidebar.tsx` (Desktop).
+    - [x] Refactor `src/components/BottomNav.tsx` (Mobile).
+    - [x] Create `src/components/DashboardHeader.tsx`.
+- [x] **Module: Dashboard Overview**
+    - [x] Implement `src/app/(dashboard)/dashboard/page.tsx`.
+    - [x] Add "Today's Timeline" widget.
+    - [x] Add "Quick Action" buttons.
+- [x] **Module: Finance**
+    - [x] Implement `src/app/(dashboard)/finance/page.tsx`.
+    - [x] Add `recharts` for visualization.
+- [x] **Module: Calendar**
+    - [x] Implement `src/app/(dashboard)/calendar/page.tsx`.
+    - [x] Add "Events" management.
+- [x] **Module: Tasks & Habits**
+    - [x] Implement `src/app/(dashboard)/tasks/page.tsx`.
+    - [x] Implement `src/app/(dashboard)/habits/page.tsx`.
+- [x] **Module: Notes**
+    - [x] Move/Refactor `src/app/notes/page.tsx` into the dashboard group.
+- [x] **Polishing & UX**
+    - [x] Entegrasyon: DashboardHeader bileşenini tüm sayfalara uygula.
+    - [x] Animasyon: PageAnimate ve mikro etkileşimleri modernize et.
+    - [x] Mobil: Tüm dokunmatik alanları 44px+ standarında optimize et.
+    - [x] Görsel: Neon glow efektlerini ve cam morfizmini premium seviyeye taşı.
