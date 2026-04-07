@@ -204,12 +204,12 @@ export default function FinancePage() {
       <DetailModal 
         transaction={selectedTransaction} 
         onClose={() => setSelectedTransaction(null)}
-        onEdit={(data) => {
+        onEdit={(data: any) => {
           setSelectedTransaction(null);
           setEditData(data);
           setIsFormOpen(true);
         }}
-        onDelete={(id) => handleDelete(id)}
+        onDelete={(id: string) => handleDelete(id)}
       />
     </div>
   );

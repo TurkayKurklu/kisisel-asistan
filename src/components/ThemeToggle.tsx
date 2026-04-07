@@ -10,7 +10,7 @@ export default function ThemeToggle() {
 
   return (
     <button
-      onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+      onClick={() => {}}
       className="relative w-10 h-10 rounded-full glass-panel flex items-center justify-center transition-all bg-white/5 border-white/10 hover:border-primary/50 overflow-hidden"
     >
       <AnimatePresence mode="wait" initial={false}>

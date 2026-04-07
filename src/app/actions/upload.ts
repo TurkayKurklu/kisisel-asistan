@@ -1,8 +1,8 @@
 "use server";
 
 import { PutObjectCommand } from "@aws-sdk/client-s3";
-import { s3Client, BUCKET_NAME } from "@/lib/s3";
-import { v4 as uuidv4 } from "uuid"; // UUID eklemek iyi olur
+import { s3Client } from "@/lib/s3";
+const BUCKET_NAME = process.env.R2_BUCKET_NAME || "kisisel-asistan";
 
 export async function uploadToR2(base64Data: string, fileName: string) {
   try {

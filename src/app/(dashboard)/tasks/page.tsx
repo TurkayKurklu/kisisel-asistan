@@ -237,12 +237,12 @@ export default function TasksPage() {
       <TaskDetailModal 
         task={selectedTask} 
         onClose={() => setSelectedTask(null)}
-        onEdit={(task) => {
+        onEdit={(task: any) => {
           setSelectedTask(null);
           setEditTaskData(task);
           setIsAddTaskOpen(true);
         }}
-        onDelete={(id) => handleDelete(id)}
+        onDelete={(id: string) => handleDelete(id)}
       />
     </div>
   );

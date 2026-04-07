@@ -20,7 +20,11 @@ const MENU_ITEMS = [
   { id: "tasks", label: "Görevler", icon: CheckSquare, href: "/tasks" },
 ];
 
-export default function BottomNav() {
+interface BottomNavProps {
+  onMenuClick?: () => void;
+}
+
+export default function BottomNav({ onMenuClick }: BottomNavProps) {
   const pathname = usePathname();
 
   return (
