@@ -188,7 +188,7 @@ export default function DashboardPage() {
               </div>
 
               <div className="w-full py-4 bg-[#10a37f] group-hover:bg-[#10a37f]/90 text-white font-bold rounded-xl text-xs uppercase tracking-widest mt-10 transition-all shadow-lg shadow-[#10a37f]/20 flex items-center justify-center gap-2">
-                Maliye Detayları <ChevronRight size={14} />
+                Maliye Detayları <ChevronRight size={14} className="" />
               </div>
             </section>
           </Link>
