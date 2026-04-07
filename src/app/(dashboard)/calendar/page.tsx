@@ -324,12 +324,12 @@ export default function CalendarPage() {
       <TaskDetailModal 
         task={selectedTask} 
         onClose={() => setSelectedTask(null)}
-        onEdit={(task) => {
+        onEdit={(task: any) => {
           setSelectedTask(null);
           setEditTaskData(task);
           setIsAddTaskOpen(true);
         }}
-        onDelete={(id) => handleDeleteTask(id)}
+        onDelete={(id: string) => handleDeleteTask(id)}
       />
     </div>
   );
@@ -427,7 +427,7 @@ function DetailField({ icon: Icon, label, value }: any) {
   );
 }
 
-function MonthlyCalendar({ selectedDate, onDateSelect, entries }: any) {
+function MonthlyCalendar({ selectedDate, onDateSelect, entries }: { selectedDate: Date, onDateSelect: any, entries: any[] }) {
   const [currentMonth, setCurrentMonth] = useState(startOfMonth(selectedDate));
   
   const nextMonth = () => setCurrentMonth(addMonths(currentMonth, 1));
@@ -506,7 +506,7 @@ function MonthlyCalendar({ selectedDate, onDateSelect, entries }: any) {
   );
 }
 
-function CalendarItem({ title, time, category, completed, onDelete, onClick, index, type }: any) {
+function CalendarItem({ title, time, category, completed, onDelete, onClick, index, type }: { title: string, time?: string, category?: string, completed?: boolean, onDelete?: any, onClick?: any, index: number, type: 'event' | 'task' }) {
   return (
     <motion.div
       initial={{ opacity: 0 }}
