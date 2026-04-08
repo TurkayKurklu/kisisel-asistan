@@ -24,6 +24,39 @@ const TOPICS = [
   { id: "urgent", name: "Acil", icon: Zap },
 ];
 
+// Helper to compress images on the client side
+const compressImage = (file: File, maxWidth: number = 1024): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (event) => {
+      const img = new Image();
+      img.src = event.target?.result as string;
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        let width = img.width;
+        let height = img.height;
+
+        if (width > maxWidth) {
+          height = (height * maxWidth) / width;
+          width = maxWidth;
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        ctx?.drawImage(img, 0, 0, width, height);
+        
+        // Quality: 0.7 for good compression vs quality balance
+        const dataUrl = canvas.toDataURL("image/jpeg", 0.7);
+        resolve(dataUrl);
+      };
+      img.onerror = reject;
+    };
+    reader.onerror = reject;
+  });
+};
+
 export default function TaskSheet({ isOpen, onClose, selectedDate, onSuccess, editData }: TaskSheetProps) {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
@@ -50,18 +83,20 @@ export default function TaskSheet({ isOpen, onClose, selectedDate, onSuccess, ed
     }
   }, [editData, isOpen]);
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (file.size > 2 * 1024 * 1024) {
-        toast.error("Resim boyutu 2MB'dan küçük olmalıdır.");
-        return;
+      const loadingToast = toast.loading("Görsel işleniyor...");
+      try {
+        // Automatically compress before sending to avoid Vercel 4.5MB payload limit
+        const compressedBase64 = await compressImage(file);
+        setImage(compressedBase64);
+        toast.dismiss(loadingToast);
+      } catch (error) {
+        console.error("Görsel sıkıştırma hatası:", error);
+        toast.error("Görsel işlenirken bir hata oluştu.");
+        toast.dismiss(loadingToast);
       }
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImage(reader.result as string);
-      };
-      reader.readAsDataURL(file);
     }
   };
 
@@ -84,7 +119,8 @@ export default function TaskSheet({ isOpen, onClose, selectedDate, onSuccess, ed
       onClose();
       if (onSuccess) onSuccess();
     } catch (error) {
-      toast.error(editData ? "Görev güncellenemedi." : "Görev oluşturulamadı.");
+      console.error("GÖREV KAYDETME HATASI:", error);
+      toast.error("Görev kaydedilirken bir hata oluştu. Lütfen bağlantınızı kontrol edin.");
     } finally {
       setIsPending(false);
     }
