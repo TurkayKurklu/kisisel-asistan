@@ -16,34 +16,40 @@ export async function getTasks() {
 
 export async function addTask(
   content: string, 
-  date: Date, 
+  date: Date | string, 
   time?: string, 
   title?: string, 
   topic?: string,
   priority: string = "low",
-  dueDate?: Date,
+  dueDate?: Date | string,
   image?: string
 ) {
   try {
+    const taskDate = typeof date === 'string' ? new Date(date) : date;
+    const taskDueDate = dueDate ? (typeof dueDate === 'string' ? new Date(dueDate) : dueDate) : null;
+
     const result = await db.task.create({
       data: { 
         content, 
-        date: new Date(date), 
+        date: taskDate, 
         time, 
         title, 
         topic,
         priority: priority as any,
-        dueDate: dueDate ? new Date(dueDate) : null,
+        dueDate: taskDueDate,
         image
       } as any,
     });
+    
+    revalidatePath("/(dashboard)/calendar");
+    revalidatePath("/calendar");
     revalidatePath("/dashboard");
     revalidatePath("/tasks");
-    revalidatePath("/(dashboard)/dashboard");
-    revalidatePath("/(dashboard)/tasks");
+    
+    return { success: true, id: result.id };
   } catch (error) {
-    console.error("GÖREV EKLEME HATASI:", error);
-    throw new Error(`Görev eklenemedi.`);
+    console.error("GÖREV EKLEME HATASI DETAY:", error);
+    throw new Error(`Görev eklenemedi: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }
 
@@ -53,10 +59,10 @@ export async function toggleTask(id: string, isCompleted: boolean) {
       where: { id },
       data: { isCompleted },
     });
+    revalidatePath("/(dashboard)/calendar");
+    revalidatePath("/calendar");
     revalidatePath("/dashboard");
     revalidatePath("/tasks");
-    revalidatePath("/(dashboard)/dashboard");
-    revalidatePath("/(dashboard)/tasks");
   } catch (error) {
     console.error("Görev güncelleme hatası:", error);
     throw new Error("Görev güncellenemedi.");
@@ -66,30 +72,35 @@ export async function toggleTask(id: string, isCompleted: boolean) {
 export async function updateTask(
   id: string,
   content: string, 
-  date: Date, 
+  date: Date | string, 
   time?: string, 
   title?: string, 
   topic?: string,
   image?: string
 ) {
   try {
+    const taskDate = typeof date === 'string' ? new Date(date) : date;
+
     await db.task.update({
       where: { id },
       data: { 
         content, 
-        date: new Date(date), 
+        date: taskDate, 
         time, 
         title, 
         topic,
         image
       } as any,
     });
+    
+    revalidatePath("/(dashboard)/calendar");
+    revalidatePath("/calendar");
     revalidatePath("/dashboard");
     revalidatePath("/tasks");
-    revalidatePath("/(dashboard)/dashboard");
-    revalidatePath("/(dashboard)/tasks");
+    
+    return { success: true };
   } catch (error) {
-    console.error("Görev güncelleme hatası:", error);
+    console.error("Görev güncelleme hatası DETAY:", error);
     throw new Error("Görev güncellenemedi.");
   }
 }
@@ -99,10 +110,12 @@ export async function deleteTask(id: string) {
     await db.task.delete({
       where: { id },
     });
+    revalidatePath("/(dashboard)/calendar");
+    revalidatePath("/calendar");
     revalidatePath("/dashboard");
     revalidatePath("/tasks");
-    revalidatePath("/(dashboard)/dashboard");
-    revalidatePath("/(dashboard)/tasks");
+    
+    return { success: true };
   } catch (error) {
     console.error("Görev silme hatası:", error);
     throw new Error("Görev silinemedi.");

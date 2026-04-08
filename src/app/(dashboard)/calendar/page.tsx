@@ -28,12 +28,18 @@ import { toast } from "sonner";
 import Portal from "@/components/Portal";
 
 export default function CalendarPage() {
+  const [mounted, setMounted] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [tasks, setTasks] = useState<any[]>([]);
   const [isAddTaskOpen, setIsAddTaskOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedTask, setSelectedTask] = useState<any>(null);
   const [editTaskData, setEditTaskData] = useState<any>(null);
+
+  useEffect(() => {
+    setMounted(true);
+    fetchData();
+  }, []);
 
   const fetchData = useCallback(async () => {
     setIsLoading(true);
@@ -46,10 +52,6 @@ export default function CalendarPage() {
       setIsLoading(false);
     }
   }, []);
-
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
 
   const filteredTasks = tasks.filter(t => isSameDay(new Date(t.date), selectedDate));
 
@@ -71,6 +73,14 @@ export default function CalendarPage() {
       cancel: { label: "İptal", onClick: () => { } }
     });
   };
+
+  if (!mounted) {
+    return (
+      <div className="space-y-10 animate-chat-fade opacity-0">
+        <DashboardHeader title="Takvim" subtitle="Yükleniyor..." showSearch={false} />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-10 animate-chat-fade">
@@ -231,7 +241,7 @@ function TaskDetailModal({ task, onClose, onEdit, onDelete }: any) {
                       <AlignLeft size={14} />
                       <span className="text-[10px] font-bold uppercase tracking-widest opacity-40">Açıklama & Detay</span>
                     </div>
-                    <div className="bg-[#020617] p-6 rounded-[24px] border border-[#1f2937] text-sm text-[#e5e7eb] leading-relaxed font-medium whitespace-pre-wrap">
+                    <div className="bg-[#020617] p-6 rounded-[24px] border border-[#1f2937] text-sm text-[#e5e7eb] width-relaxed font-medium whitespace-pre-wrap leading-relaxed">
                       {task.content || "Detaylı açıklama bulunmuyor."}
                     </div>
                   </div>
@@ -293,7 +303,7 @@ function MonthlyCalendar({ selectedDate, onDateSelect, entries }: { selectedDate
           <button onClick={prevMonth} className="w-10 h-10 rounded-xl flex items-center justify-center text-[#9ca3af] hover:bg-[#1f2937] hover:text-white transition-all">
             <ChevronLeft size={20} />
           </button>
-          <button onClick={nextMonth} className="w-10 h-10 rounded-xl flex items-center justify-center text-[#9ca3af] hover:bg-[#1f2937] hover:text-white transition-all">
+          <button onClick={nextMonth} className="w-10 h-10 rounded-xl flex items-center justify-center text-[#9ca3af] hover:bg-[#111827] hover:bg-[#1f2937] hover:text-white transition-all">
             <ChevronRight size={20} />
           </button>
         </div>

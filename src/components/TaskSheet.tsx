@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Clock, Type, AlignLeft, Sparkles, Loader2, Briefcase, Heart, ShoppingCart, Star, Zap, ChevronLeft, ChevronRight, ChevronDown, Send, Edit2, Camera } from "lucide-react";
+import { X, Clock, Type, AlignLeft, Sparkles, Loader2, Briefcase, Heart, ShoppingCart, Star, Zap, Send, Edit2, Camera, ImageIcon } from "lucide-react";
 import { addTask, updateTask } from "@/app/actions/tasks";
 import { cn } from "@/lib/utils";
 import Portal from "./Portal";
@@ -29,9 +29,10 @@ export default function TaskSheet({ isOpen, onClose, selectedDate, onSuccess, ed
   const [content, setContent] = useState("");
   const [time, setTime] = useState("12:00");
   const [topic, setTopic] = useState("work");
-  const [image, setImage] = useState("");
+  const [image, setImage] = useState<string | null>(null);
   const [isPending, setIsPending] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (editData) {
@@ -39,15 +40,30 @@ export default function TaskSheet({ isOpen, onClose, selectedDate, onSuccess, ed
       setContent(editData.content || "");
       setTime(editData.time || "12:00");
       setTopic(editData.topic || "work");
-      setImage(editData.image || "");
+      setImage(editData.image || null);
     } else {
       setTitle("");
       setContent("");
       setTime("12:00");
       setTopic("work");
-      setImage("");
+      setImage(null);
     }
   }, [editData, isOpen]);
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 2 * 1024 * 1024) {
+        toast.error("Resim boyutu 2MB'dan küçük olmalıdır.");
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImage(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -88,7 +104,7 @@ export default function TaskSheet({ isOpen, onClose, selectedDate, onSuccess, ed
               <div className="flex justify-between items-center mb-8">
                 <div className="flex items-center gap-4">
                   <div className="w-10 h-10 bg-[#1f2937] rounded-xl flex items-center justify-center text-[#10a37f]">
-                    {editData ? <Edit2 size={18} /> : <Edit2 size={18} />}
+                    {editData ? <Edit2 size={18} /> : <Sparkles size={18} />}
                   </div>
                   <div>
                     <h2 className="text-xl font-bold text-[#e5e7eb]">{editData ? "Görevi Düzenle" : "Yeni Görev"}</h2>
@@ -134,20 +150,37 @@ export default function TaskSheet({ isOpen, onClose, selectedDate, onSuccess, ed
 
                   <div className="space-y-2">
                     <label className="text-[10px] font-bold text-[#9ca3af] uppercase tracking-widest ml-1 opacity-60 flex items-center gap-2">
-                       <Camera size={12} /> Görsel URL (Opsiyonel)
+                       <Camera size={12} /> Görsel
                     </label>
-                    <div className="relative group">
-                      <input
-                        type="url"
-                        value={image}
-                        onChange={(e) => setImage(e.target.value)}
-                        placeholder="https://örnek.com/görsel.jpg"
-                        className="w-full bg-[#111827] border border-[#1f2937] rounded-xl px-4 py-3.5 text-xs font-medium text-[#e5e7eb] placeholder-[#9ca3af]/20 focus:outline-none focus:border-[#10a37f]/50 transition-all"
+                    <div className="space-y-4">
+                      <input 
+                        type="file" 
+                        accept="image/*" 
+                        className="hidden" 
+                        ref={fileInputRef} 
+                        onChange={handleImageUpload}
                       />
-                      {image && (
-                        <div className="mt-4 w-full h-32 rounded-2xl overflow-hidden border border-[#1f2937] bg-[#020617]">
-                          <img src={image} alt="Önizleme" className="w-full h-full object-cover" />
+                      
+                      {image ? (
+                        <div className="relative w-full h-40 rounded-2xl overflow-hidden border border-[#1f2937] group bg-[#020617]">
+                          <img src={image} alt="Preview" className="w-full h-full object-cover" />
+                          <button 
+                            type="button"
+                            onClick={() => setImage(null)}
+                            className="absolute top-3 right-3 p-1.5 bg-[#020617]/80 backdrop-blur-md rounded-lg text-white opacity-100 sm:opacity-0 group-hover:opacity-100 transition-all border border-[#1f2937]"
+                          >
+                            <X size={14} />
+                          </button>
                         </div>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => fileInputRef.current?.click()}
+                          className="w-full py-5 border-2 border-dashed border-[#1f2937] rounded-2xl flex items-center justify-center gap-3 text-[#9ca3af] hover:text-[#10a37f] hover:border-[#10a37f]/30 hover:bg-[#10a37f]/5 transition-all outline-none"
+                        >
+                          <ImageIcon size={18} />
+                          <span className="text-[10px] font-bold uppercase tracking-widest">Görsel Yükle</span>
+                        </button>
                       )}
                     </div>
                   </div>
