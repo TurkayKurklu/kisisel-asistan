@@ -17,15 +17,18 @@ import { tr } from "date-fns/locale";
 import { motion, AnimatePresence } from "framer-motion";
 import { getNotes, deleteNote } from "@/app/actions/notes";
 import { cn } from "@/lib/utils";
-import NoteFAB from "@/components/NoteFAB";
+import NoteSheet from "@/components/NoteSheet";
 import DashboardHeader from "@/components/DashboardHeader";
 import { toast } from "sonner";
+import { Edit2 } from "lucide-react";
 
 export default function NotesPage() {
   const [notes, setNotes] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [isNoteSheetOpen, setIsNoteSheetOpen] = useState(false);
+  const [selectedNote, setSelectedNote] = useState<any>(null);
 
   const fetchData = useCallback(async () => {
     setIsLoading(true);
@@ -44,35 +47,33 @@ export default function NotesPage() {
   }, [fetchData]);
 
   const handleDelete = async (id: string) => {
-    toast("Notu silmek istediğinize emin misiniz?", {
-      action: {
-        label: "Sil",
-        onClick: async () => {
-          const previousNotes = [...notes];
-          setNotes(prev => prev.filter(n => n.id !== id));
-          try {
-            await deleteNote(id);
-            toast.success("Not başarıyla silindi.");
-          } catch (error) {
-            setNotes(previousNotes);
-            toast.error("Silme işlemi başarısız oldu.");
-          }
-        },
-      },
-      cancel: { label: "İptal", onClick: () => { } }
-    });
+    const isConfirmed = window.confirm("Notu silmek istediğinize emin misiniz?");
+    if (!isConfirmed) return;
+
+    try {
+      await deleteNote(id);
+      toast.success("Not başarıyla silindi.");
+      fetchData();
+    } catch (error) {
+      toast.error("Silme işlemi başarısız oldu.");
+    }
+  };
+
+  const handleEdit = (note: any) => {
+    setSelectedNote(note);
+    setIsNoteSheetOpen(true);
   };
 
   const filteredNotes = notes.filter(n =>
-    n.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    n.content.toLowerCase().includes(searchQuery.toLowerCase())
+    (n.title?.toLowerCase() || "").includes(searchQuery.toLowerCase()) ||
+    (n.content?.toLowerCase() || "").includes(searchQuery.toLowerCase())
   );
 
   return (
     <div className="space-y-10 animate-chat-fade">
       <DashboardHeader
         title="Notlarım"
-        subtitle="Kısa notlar alın"
+        subtitle="Kısa notlar alın ve düşüncelerinizi organize edin."
         showSearch={false}
       />
 
@@ -99,15 +100,23 @@ export default function NotesPage() {
           </button>
         </div>
 
-        <div className="relative w-full sm:w-64">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9ca3af]/40" size={16} />
-          <input
-            type="text"
-            placeholder="Notlarda ara..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 bg-[#111827] border border-[#1f2937] rounded-xl text-xs font-medium focus:outline-none focus:border-[#10a37f]/50 transition-all placeholder:text-[#9ca3af]/20"
-          />
+        <div className="flex items-center gap-4 w-full sm:w-auto">
+          <div className="relative flex-1 sm:w-64">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9ca3af]/40" size={16} />
+            <input
+              type="text"
+              placeholder="Notlarda ara..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-4 py-2.5 bg-[#111827] border border-[#1f2937] rounded-xl text-xs font-medium focus:outline-none focus:border-[#10a37f]/50 transition-all placeholder:text-[#9ca3af]/20"
+            />
+          </div>
+          <button
+            onClick={() => { setSelectedNote(null); setIsNoteSheetOpen(true); }}
+            className="px-4 py-2.5 bg-[#10a37f] hover:bg-[#10a37f]/90 text-white rounded-xl text-xs font-bold transition-all flex items-center gap-2 shadow-lg shadow-[#10a37f]/10"
+          >
+            <FileText size={14} /> Yeni Not
+          </button>
         </div>
       </section>
 
@@ -137,6 +146,7 @@ export default function NotesPage() {
                   note={note}
                   viewMode={viewMode}
                   onDelete={() => handleDelete(note.id)}
+                  onEdit={() => handleEdit(note)}
                   index={i}
                 />
               ))}
@@ -145,21 +155,22 @@ export default function NotesPage() {
         )}
       </section>
 
-      <NoteFAB onSuccess={fetchData} />
+      <NoteSheet 
+        isOpen={isNoteSheetOpen} 
+        onClose={() => setIsNoteSheetOpen(false)} 
+        onSuccess={fetchData}
+        editData={selectedNote}
+      />
     </div>
   );
 }
 
-function NoteItem({ note, viewMode, onDelete, index }: any) {
+function NoteItem({ note, viewMode, onDelete, onEdit, index }: any) {
   const isGrid = viewMode === "grid";
 
-  // R2 Public URL resolver
-  // Not: NEXT_PUBLIC_ öneki olmayan değişkenler client-side'da undefined döner.
-  // Bu yüzden koda bir placeholder/fallback ekliyoruz.
   const getImageUrl = (img: string) => {
     if (!img) return "";
     if (img.startsWith("data:") || img.startsWith("http")) return img;
-    // Cloudflare R2 Public URL (r2.dev or custom domain)
     const publicUrl = process.env.NEXT_PUBLIC_R2_URL || "";
     return `${publicUrl}/${img}`;
   };
@@ -217,6 +228,12 @@ function NoteItem({ note, viewMode, onDelete, index }: any) {
 
         <div className={cn("flex items-center justify-between", isGrid ? "pt-4 mt-auto border-t border-[#1f2937]" : "ml-auto")}>
           <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all">
+            <button
+              onClick={(e) => { e.stopPropagation(); onEdit(); }}
+              className="p-2 text-[#9ca3af] hover:text-[#10a37f] transition-colors"
+            >
+              <Edit2 size={16} />
+            </button>
             <button
               onClick={(e) => { e.stopPropagation(); onDelete(); }}
               className="p-2 text-rose-500/60 hover:text-rose-500 transition-colors"

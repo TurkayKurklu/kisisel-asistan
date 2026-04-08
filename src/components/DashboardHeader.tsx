@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { tr } from "date-fns/locale";
-import { Bell, User, Search, Menu } from "lucide-react";
+import { Search, Menu } from "lucide-react";
 import { useSidebar } from "./SidebarContext";
 
 interface DashboardHeaderProps {
@@ -64,21 +64,6 @@ export default function DashboardHeader({ title, subtitle, showSearch = true }: 
           </div>
         )}
 
-        <div className="flex items-center gap-4 bg-[#111827] p-1.5 rounded-xl border border-[#1f2937]">
-          <button className="w-9 h-9 rounded-lg flex items-center justify-center text-[#9ca3af] hover:text-white transition-colors relative group">
-            <Bell size={18} />
-            <div className="absolute top-2 right-2 w-1.5 h-1.5 bg-[#10a37f] rounded-full" />
-          </button>
-
-          <div className="w-px h-5 bg-[#1f2937] mx-1" />
-
-          <button className="flex items-center gap-2 pl-1 pr-2 py-1 hover:bg-[#1f2937] rounded-lg transition-all group">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#10a37f] to-emerald-600 flex items-center justify-center text-white text-xs font-bold shadow-sm">
-              <User size={16} />
-            </div>
-            <span className="text-xs font-bold text-[#e5e7eb] hidden sm:inline-block">Admin</span>
-          </button>
-        </div>
       </div>
     </header>
   );

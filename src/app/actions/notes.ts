@@ -40,6 +40,29 @@ export async function deleteNote(id: string) {
   }
 }
 
+export async function updateNote(id: string, title: string, content: string, image?: string) {
+  try {
+    let finalImageUrl = image;
+
+    if (image && image.startsWith("data:")) {
+      const uploadResult = await uploadToR2(image, `note-img-${Date.now()}.png`);
+      if (uploadResult.success) {
+        finalImageUrl = uploadResult.url;
+      }
+    }
+
+    await db.note.update({
+      where: { id },
+      data: { title, content, image: finalImageUrl },
+    });
+    revalidatePath("/notes");
+    revalidatePath("/(dashboard)/notes");
+  } catch (error) {
+    console.error("Not güncelleme hatası:", error);
+    throw new Error("Not güncellenemedi.");
+  }
+}
+
 export async function getNotes() {
   try {
     return await db.note.findMany({

@@ -12,6 +12,8 @@ import {
   ArrowRightCircle,
   Calendar
 } from "lucide-react";
+import { format } from "date-fns";
+import { tr } from "date-fns/locale";
 import { motion } from "framer-motion";
 import { getTasks } from "@/app/actions/tasks";
 import { getFinanceSummary } from "@/app/actions/finance";
@@ -68,6 +70,71 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* Left Column (8/12) */}
         <div className="lg:col-span-8 space-y-8">
+          {/* Daily Workflow Section -  Style List */}
+          <section className="bg-[#111827] border border-[#1f2937] rounded-2xl overflow-hidden shadow-sm">
+            <div className="p-6 border-b border-[#1f2937] flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-[#10a37f]/10 flex items-center justify-center text-[#10a37f]">
+                  <Sparkles size={20} />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-[#e5e7eb]">Günlük Planlar</h3>
+                  <p className="text-[11px] text-[#9ca3af] font-medium">Tarih sırasına göre tüm planların</p>
+                </div>
+              </div>
+              <Link
+                href="/tasks"
+                className="text-xs font-bold text-[#10a37f] hover:underline flex items-center gap-1.5"
+              >
+                Tümünü Gör <ArrowRight size={14} />
+              </Link>
+            </div>
+
+            <div className="divide-y divide-[#1f2937]">
+              {[...pendingTasks, ...todayEvents]
+                .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+                .slice(0, 6)
+                .length === 0 ? (
+                <div className="p-12 text-center text-[#9ca3af]/40 italic text-sm">
+                  Henüz bir aktivite planlanmadı.
+                </div>
+              ) : (
+                [...pendingTasks, ...todayEvents]
+                  .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+                  .slice(0, 6)
+                  .map((item, i) => (
+                    <Link
+                      key={i}
+                      href={item.amount !== undefined ? "/finance" : (item.topic ? "/tasks" : "/calendar")}
+                      className="flex items-center justify-between p-5 hover:bg-[#1f2937]/50 transition-all cursor-pointer group"
+                    >
+                      <div className="flex items-center gap-4 min-w-0 flex-1">
+                        <div className={cn(
+                          "w-10 h-10 rounded-lg flex items-center justify-center bg-[#1f2937] border border-[#1f2937] shrink-0",
+                          item.amount !== undefined ? "text-rose-400" : "text-[#10a37f]"
+                        )}>
+                          {item.time ? <Clock size={18} /> : (item.amount !== undefined ? <Activity size={18} /> : <CheckCircle2 size={18} />)}
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-sm font-bold text-[#e5e7eb] group-hover:text-white transition-colors truncate">{item.title || item.content}</p>
+                          <div className="flex items-center gap-2 mt-0.5">
+                            <p className="text-[10px] text-[#10a37f] font-bold uppercase tracking-wider opacity-80">
+                              {format(new Date(item.date), "d MMM", { locale: tr })}
+                            </p>
+                            <span className="text-[10px] text-[#9ca3af]/20">•</span>
+                            <p className="text-[10px] text-[#9ca3af] font-bold uppercase tracking-wider opacity-60">
+                              {item.time || "Tüm Gün"} • {item.amount !== undefined ? "İşlem" : (item.topic || "Etkinlik")}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                      <ArrowRightCircle size={18} className="text-[#9ca3af]/20 group-hover:text-[#10a37f] transition-all shrink-0 ml-4" />
+                    </Link>
+                  ))
+              )}
+            </div>
+          </section>
+
           {/* Stats Grid */}
           <section className="grid grid-cols-1 sm:grid-cols-3 gap-6">
             <StatCard
@@ -91,59 +158,6 @@ export default function DashboardPage() {
               trend="Zamanını Yönet"
               href="/calendar"
             />
-          </section>
-
-          {/* Daily Workflow Section -  Style List */}
-          <section className="bg-[#111827] border border-[#1f2937] rounded-2xl overflow-hidden shadow-sm">
-            <div className="p-6 border-b border-[#1f2937] flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-[#10a37f]/10 flex items-center justify-center text-[#10a37f]">
-                  <Sparkles size={20} />
-                </div>
-                <div>
-                  <h3 className="text-lg font-bold text-[#e5e7eb]">Günlük Planlar</h3>
-                  <p className="text-[11px] text-[#9ca3af] font-medium">Bugün için planladıkların</p>
-                </div>
-              </div>
-              <Link
-                href="/tasks"
-                className="text-xs font-bold text-[#10a37f] hover:underline flex items-center gap-1.5"
-              >
-                Tümünü Gör <ArrowRight size={14} />
-              </Link>
-            </div>
-
-            <div className="divide-y divide-[#1f2937]">
-              {[...pendingTasks.slice(0, 4), ...todayEvents.slice(0, 2)].length === 0 ? (
-                <div className="p-12 text-center text-[#9ca3af]/40 italic text-sm">
-                  Henüz bir aktivite planlanmadı.
-                </div>
-              ) : (
-                [...pendingTasks.slice(0, 4), ...todayEvents.slice(0, 2)].map((item, i) => (
-                  <Link
-                    key={i}
-                    href={item.amount !== undefined ? "/finance" : (item.topic ? "/tasks" : "/calendar")}
-                    className="flex items-center justify-between p-5 hover:bg-[#1f2937]/50 transition-all cursor-pointer group"
-                  >
-                    <div className="flex items-center gap-4">
-                      <div className={cn(
-                        "w-10 h-10 rounded-lg flex items-center justify-center bg-[#1f2937] border border-[#1f2937]",
-                        item.amount !== undefined ? "text-rose-400" : "text-[#10a37f]"
-                      )}>
-                        {item.time ? <Clock size={18} /> : (item.amount !== undefined ? <Activity size={18} /> : <CheckCircle2 size={18} />)}
-                      </div>
-                      <div>
-                        <p className="text-sm font-bold text-[#e5e7eb] group-hover:text-white transition-colors">{item.title || item.content}</p>
-                        <p className="text-[10px] text-[#9ca3af] font-bold uppercase tracking-wider mt-0.5 opacity-60">
-                          {item.time || "Tüm Gün"} • {item.amount !== undefined ? "İşlem" : (item.topic || "Etkinlik")}
-                        </p>
-                      </div>
-                    </div>
-                    <ArrowRightCircle size={18} className="text-[#9ca3af]/20 group-hover:text-[#10a37f] transition-all" />
-                  </Link>
-                ))
-              )}
-            </div>
           </section>
         </div>
 

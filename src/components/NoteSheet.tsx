@@ -2,28 +2,18 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { format } from "date-fns";
-import { X, Clock, Type, AlignLeft, Sparkles, Loader2, Briefcase, Heart, ShoppingCart, Star, Zap, Send, Edit2, Camera, ImageIcon, Calendar } from "lucide-react";
-import { addTask, updateTask } from "@/app/actions/tasks";
+import { X, Type, AlignLeft, Sparkles, Loader2, Send, Edit2, Camera, ImageIcon } from "lucide-react";
+import { createNote, updateNote } from "@/app/actions/notes";
 import { cn } from "@/lib/utils";
 import Portal from "./Portal";
 import { toast } from "sonner";
 
-interface TaskSheetProps {
+interface NoteSheetProps {
   isOpen: boolean;
   onClose: () => void;
-  selectedDate: Date;
   onSuccess?: () => void;
   editData?: any;
 }
-
-const TOPICS = [
-  { id: "work", name: "İş", icon: Briefcase },
-  { id: "life", name: "Yaşam", icon: Heart },
-  { id: "shop", name: "Market", icon: ShoppingCart },
-  { id: "study", name: "Eğitim", icon: Star },
-  { id: "urgent", name: "Acil", icon: Zap },
-];
 
 // Helper to compress images on the client side
 const compressImage = (file: File, maxWidth: number = 1024): Promise<string> => {
@@ -48,7 +38,6 @@ const compressImage = (file: File, maxWidth: number = 1024): Promise<string> => 
         const ctx = canvas.getContext("2d");
         ctx?.drawImage(img, 0, 0, width, height);
         
-        // Quality: 0.7 for good compression vs quality balance
         const dataUrl = canvas.toDataURL("image/jpeg", 0.7);
         resolve(dataUrl);
       };
@@ -58,41 +47,30 @@ const compressImage = (file: File, maxWidth: number = 1024): Promise<string> => 
   });
 };
 
-export default function TaskSheet({ isOpen, onClose, selectedDate, onSuccess, editData }: TaskSheetProps) {
+export default function NoteSheet({ isOpen, onClose, onSuccess, editData }: NoteSheetProps) {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [time, setTime] = useState("12:00");
-  const [date, setDate] = useState(format(selectedDate, "yyyy-MM-dd"));
-  const [topic, setTopic] = useState("work");
   const [image, setImage] = useState<string | null>(null);
   const [isPending, setIsPending] = useState(false);
-  const scrollRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (editData) {
       setTitle(editData.title || "");
       setContent(editData.content || "");
-      setTime(editData.time || "12:00");
-      setDate(format(new Date(editData.date), "yyyy-MM-dd"));
-      setTopic(editData.topic || "work");
       setImage(editData.image || null);
     } else {
       setTitle("");
       setContent("");
-      setTime("12:00");
-      setDate(format(selectedDate, "yyyy-MM-dd"));
-      setTopic("work");
       setImage(null);
     }
-  }, [editData, isOpen, selectedDate]);
+  }, [editData, isOpen]);
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       const loadingToast = toast.loading("Görsel işleniyor...");
       try {
-        // Automatically compress before sending to avoid Vercel 4.5MB payload limit
         const compressedBase64 = await compressImage(file);
         setImage(compressedBase64);
         toast.dismiss(loadingToast);
@@ -107,25 +85,24 @@ export default function TaskSheet({ isOpen, onClose, selectedDate, onSuccess, ed
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!content.trim()) {
-      toast.error("Lütfen görev içeriğini girin.");
+      toast.error("Lütfen not içeriğini girin.");
       return;
     }
 
     setIsPending(true);
-    const finalDate = new Date(date);
     try {
       if (editData) {
-        await updateTask(editData.id, content, finalDate, time || undefined, title || undefined, topic, image || undefined);
-        toast.success("Görev başarıyla güncellendi.");
+        await updateNote(editData.id, title, content, image || undefined);
+        toast.success("Not başarıyla güncellendi.");
       } else {
-        await addTask(content, finalDate, time || undefined, title || undefined, topic, "low", undefined, image || undefined);
-        toast.success("Görev başarıyla oluşturuldu.");
+        await createNote(title, content, image || undefined);
+        toast.success("Not başarıyla oluşturuldu.");
       }
       onClose();
       if (onSuccess) onSuccess();
     } catch (error) {
-      console.error("GÖREV KAYDETME HATASI:", error);
-      toast.error("Görev kaydedilirken bir hata oluştu. Lütfen bağlantınızı kontrol edin.");
+      console.error("NOT KAYDETME HATASI:", error);
+      toast.error("Not kaydedilirken bir hata oluştu.");
     } finally {
       setIsPending(false);
     }
@@ -148,8 +125,8 @@ export default function TaskSheet({ isOpen, onClose, selectedDate, onSuccess, ed
                     {editData ? <Edit2 size={18} /> : <Sparkles size={18} />}
                   </div>
                   <div>
-                    <h2 className="text-xl font-bold text-[#e5e7eb]">{editData ? "Görevi Düzenle" : "Yeni Görev"}</h2>
-                    <p className="text-[9px] text-[#9ca3af] uppercase font-bold tracking-[0.2em] mt-0.5">Planlama Merkezi</p>
+                    <h2 className="text-xl font-bold text-[#e5e7eb]">{editData ? "Notu Düzenle" : "Yeni Not"}</h2>
+                    <p className="text-[9px] text-[#9ca3af] uppercase font-bold tracking-[0.2em] mt-0.5">Hızlı Notlar</p>
                   </div>
                 </div>
                 <button 
@@ -170,21 +147,21 @@ export default function TaskSheet({ isOpen, onClose, selectedDate, onSuccess, ed
                       type="text"
                       value={title}
                       onChange={(e) => setTitle(e.target.value)}
-                      placeholder="Göreve bir isim ver..."
-                      className="w-full bg-[#111827] border border-[#1f2937] rounded-xl px-4 py-3.5 text-md font-bold text-[#e5e7eb] placeholder-[#9ca3af]/20 focus:outline-none focus:border-[#10a37f]/50 transition-all font-bold"
+                      placeholder="Notuna bir isim ver..."
+                      className="w-full bg-[#111827] border border-[#1f2937] rounded-xl px-4 py-3.5 text-md font-bold text-[#e5e7eb] placeholder-[#9ca3af]/20 focus:outline-none focus:border-[#10a37f]/50 transition-all"
                     />
                   </div>
 
                   <div className="space-y-2">
                     <label className="text-[10px] font-bold text-[#9ca3af] uppercase tracking-widest ml-1 opacity-60 flex items-center gap-2">
-                       <AlignLeft size={12} /> Detaylar
+                       <AlignLeft size={12} /> İçerik
                     </label>
                     <textarea
                       required
                       value={content}
                       onChange={(e) => setContent(e.target.value)}
-                      placeholder="Neler yapmayı planlıyorsun?"
-                      rows={3}
+                      placeholder="Neler düşünüyorsun?"
+                      rows={5}
                       className="w-full bg-[#111827] border border-[#1f2937] rounded-xl px-4 py-4 text-sm text-[#e5e7eb] placeholder-[#9ca3af]/20 focus:outline-none focus:border-[#10a37f]/50 transition-all resize-none leading-relaxed font-medium"
                     />
                   </div>
@@ -204,7 +181,7 @@ export default function TaskSheet({ isOpen, onClose, selectedDate, onSuccess, ed
                       
                       {image ? (
                         <div className="relative w-full h-40 rounded-2xl overflow-hidden border border-[#1f2937] group bg-[#020617]">
-                          <img src={image} alt="Preview" className="w-full h-full object-cover" />
+                          <img src={image.startsWith("data:") || image.startsWith("http") ? image : `${process.env.NEXT_PUBLIC_R2_URL}/${image}`} alt="Preview" className="w-full h-full object-cover" />
                           <button 
                             type="button"
                             onClick={() => setImage(null)}
@@ -227,80 +204,6 @@ export default function TaskSheet({ isOpen, onClose, selectedDate, onSuccess, ed
                   </div>
                 </div>
 
-                <div className="space-y-6">
-                  <div className="space-y-3">
-                    <label className="text-[10px] font-bold text-[#9ca3af] uppercase tracking-widest ml-1 opacity-60 flex items-center gap-2">
-                       <Calendar size={12} /> Planlanan Tarih
-                    </label>
-                    <input
-                      type="date"
-                      value={date}
-                      onChange={(e) => setDate(e.target.value)}
-                      className="w-full bg-[#111827] border border-[#1f2937] rounded-xl px-4 py-3.5 text-sm font-bold text-[#e5e7eb] focus:outline-none focus:border-[#10a37f]/50 transition-all cursor-pointer [color-scheme:dark]"
-                    />
-                  </div>
-
-                  <div className="space-y-3 relative group/topic">
-                    <label className="text-[10px] font-bold text-[#9ca3af] uppercase tracking-widest ml-1 opacity-60">Kategori</label>
-                    
-                    <div className="relative">
-                      <div 
-                        ref={scrollRef}
-                        className="flex gap-2.5 overflow-x-auto no-scrollbar pb-1 px-1 scroll-smooth"
-                      >
-                        {TOPICS.map((t) => (
-                          <button
-                            key={t.id}
-                            type="button"
-                            onClick={() => setTopic(t.id)}
-                            className={cn(
-                              "flex-shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all border font-bold text-[11px]",
-                              topic === t.id 
-                                ? "bg-[#10a37f] text-white border-[#10a37f] shadow-lg shadow-[#10a37f]/10" 
-                                : "bg-[#1f2937] text-[#9ca3af] border-[#1f2937] hover:border-[#9ca3af]/20"
-                            )}
-                          >
-                            <t.icon size={12} />
-                            <span>{t.name}</span>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="space-y-3">
-                    <label className="text-[10px] font-bold text-[#9ca3af] uppercase tracking-widest ml-1 opacity-60 flex items-center gap-2">
-                       <Clock size={12} /> Planlanan Saat
-                    </label>
-                    <div className="flex items-center gap-3 bg-[#111827] border border-[#1f2937] p-1.5 rounded-2xl">
-                      <div className="flex-1 flex gap-2">
-                        <select 
-                          value={time.split(":")[0] || "12"}
-                          onChange={(e) => setTime(`${e.target.value.padStart(2, '0')}:${time.split(":")[1] || "00"}`)}
-                          className="flex-1 bg-[#1f2937] border border-[#1f2937] rounded-xl py-3 text-center text-lg font-bold text-[#e5e7eb] focus:outline-none appearance-none cursor-pointer"
-                        >
-                          {Array.from({ length: 24 }).map((_, i) => (
-                            <option key={i} value={i.toString().padStart(2, '0')}>{i.toString().padStart(2, '0')}</option>
-                          ))}
-                        </select>
-                        <div className="flex items-center text-[#9ca3af]/40 font-bold">:</div>
-                        <select 
-                          value={time.split(":")[1] || "00"}
-                          onChange={(e) => setTime(`${time.split(":")[0] || "12"}:${e.target.value.padStart(2, '0')}`)}
-                          className="flex-1 bg-[#1f2937] border border-[#1f2937] rounded-xl py-3 text-center text-lg font-bold text-[#e5e7eb] focus:outline-none appearance-none cursor-pointer"
-                        >
-                          {Array.from({ length: 12 }).map((_, i) => (
-                            <option key={i * 5} value={(i * 5).toString().padStart(2, '0')}>{(i * 5).toString().padStart(2, '0')}</option>
-                          ))}
-                        </select>
-                      </div>
-                      <div className="px-4 py-3 bg-[#111827] border border-[#1f2937] rounded-xl text-[#10a37f] font-bold text-[11px] uppercase tracking-widest">
-                        {time}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
                 <button
                   type="submit"
                   disabled={isPending}
@@ -312,7 +215,7 @@ export default function TaskSheet({ isOpen, onClose, selectedDate, onSuccess, ed
                   {isPending ? <Loader2 size={20} className="animate-spin" /> : (
                     <>
                       <Send size={16} />
-                      {editData ? "Güncellemeyi Kaydet" : "Görevi Kaydet"}
+                      {editData ? "Notu Güncelle" : "Notu Kaydet"}
                     </>
                   )}
                 </button>
