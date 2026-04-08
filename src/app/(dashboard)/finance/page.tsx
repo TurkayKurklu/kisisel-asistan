@@ -3,12 +3,9 @@
 import React, { useState, useEffect, useCallback } from "react";
 import {
   Wallet,
-  TrendingUp,
-  TrendingDown,
   Plus,
   Search,
   Filter,
-  MoreVertical,
   ArrowUpRight,
   ChevronRight,
   ArrowDownLeft,
@@ -125,21 +122,6 @@ export default function FinancePage() {
             </div>
           </div>
 
-          {/* Stats Mini Cards - Grid used for stability */}
-          <div className="grid grid-cols-2 lg:grid-cols-1 gap-4">
-            <StatsMiniCard
-              label="Haftalık Değişim"
-              value={`+₺${(summary?.totalIncome * 0.12).toFixed(0)}`}
-              trend="up"
-              icon={TrendingUp}
-            />
-            <StatsMiniCard
-              label="Bütçe Skoru"
-              value="%84"
-              trend="stable"
-              icon={TrendingUp}
-            />
-          </div>
         </div>
 
         {/* Right Column - Transaction History */}
@@ -354,22 +336,6 @@ function DetailInfo({ icon: Icon, label, value }: any) {
       <div>
         <p className="text-[9px] font-bold text-[#9ca3af]/40 uppercase tracking-widest">{label}</p>
         <p className="text-sm font-bold text-[#e5e7eb]">{value}</p>
-      </div>
-    </div>
-  );
-}
-
-function StatsMiniCard({ label, value, trend, icon: Icon }: any) {
-  return (
-    <div className="bg-[#111827] border border-[#1f2937] p-6 rounded-3xl flex items-center justify-between group hover:border-[#10a37f]/20 transition-all">
-      <div className="flex items-center gap-4">
-        <div className="w-10 h-10 bg-[#1f2937] rounded-xl flex items-center justify-center text-[#10a37f] border border-[#1f2937]">
-          <Icon size={18} />
-        </div>
-        <div>
-          <p className="text-[10px] font-bold text-[#9ca3af] uppercase tracking-wider mb-0.5">{label}</p>
-          <p className="text-xl font-bold text-[#e5e7eb] tracking-tight">{value}</p>
-        </div>
       </div>
     </div>
   );

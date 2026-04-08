@@ -47,16 +47,21 @@ export default function NotesPage() {
   }, [fetchData]);
 
   const handleDelete = async (id: string) => {
-    const isConfirmed = window.confirm("Notu silmek istediğinize emin misiniz?");
-    if (!isConfirmed) return;
-
-    try {
-      await deleteNote(id);
-      toast.success("Not başarıyla silindi.");
-      fetchData();
-    } catch (error) {
-      toast.error("Silme işlemi başarısız oldu.");
-    }
+    toast("Notu silmek istediğinize emin misiniz?", {
+      action: {
+        label: "Sil",
+        onClick: async () => {
+          try {
+            await deleteNote(id);
+            toast.success("Not başarıyla silindi.");
+            fetchData();
+          } catch (error) {
+            toast.error("Silme işlemi başarısız oldu.");
+          }
+        },
+      },
+      cancel: { label: "İptal", onClick: () => { } }
+    });
   };
 
   const handleEdit = (note: any) => {

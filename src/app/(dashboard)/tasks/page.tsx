@@ -9,7 +9,7 @@ import {
   Calendar as CalendarIcon,
   CheckCircle2,
   Inbox,
-  Sparkles,
+  Plus,
   ArrowRight,
   X,
   Edit2,
@@ -143,7 +143,7 @@ export default function TasksPage() {
             onClick={() => { setEditTaskData(null); setIsAddTaskOpen(true); }}
             className="px-4 py-2.5 bg-[#10a37f] hover:bg-[#10a37f]/90 text-white rounded-xl text-xs font-bold transition-all flex items-center gap-2 shadow-lg shadow-[#10a37f]/10"
           >
-            <Sparkles size={14} /> Yeni Görev
+            <Plus size={14} /> Yeni Görev
           </button>
         </div>
       </section>
@@ -329,7 +329,7 @@ function TaskDetailModal({ task, onClose, onEdit, onDelete }: any) {
                 <div className="flex justify-between items-center text-[#9ca3af]">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 bg-[#1f2937] rounded-xl flex items-center justify-center text-[#10a37f]">
-                      <Sparkles size={20} />
+                      <Plus size={20} />
                     </div>
                     <span className="text-xs font-bold uppercase tracking-widest px-1">GÖREV DETAYI</span>
                   </div>
