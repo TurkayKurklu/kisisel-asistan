@@ -17,7 +17,7 @@ model Task {
   time        String?  // HH:mm format
   priority    String   @default("low") // low, medium, high
   isCompleted Boolean  @default(false)
-  image       String?  // Görsel URL veya R2 key
+  image       String?  @db.Text // Görsel URL veya Base64
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }

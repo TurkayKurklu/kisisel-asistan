@@ -96,7 +96,11 @@ export default function CalendarPage() {
           <div className="bg-[#111827] border border-[#1f2937] p-2 sm:p-6 rounded-[2rem] shadow-sm overflow-hidden">
             <MonthlyCalendar
               selectedDate={selectedDate}
-              onDateSelect={setSelectedDate}
+              onDateSelect={(date: Date) => {
+                setSelectedDate(date);
+                setEditTaskData(null);
+                setIsAddTaskOpen(true);
+              }}
               entries={tasks}
             />
           </div>

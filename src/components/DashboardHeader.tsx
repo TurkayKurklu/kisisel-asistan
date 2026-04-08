@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { tr } from "date-fns/locale";
 import { Bell, User, Search, Menu } from "lucide-react";
@@ -13,8 +13,14 @@ interface DashboardHeaderProps {
 }
 
 export default function DashboardHeader({ title, subtitle, showSearch = true }: DashboardHeaderProps) {
-  const currentTime = new Date();
+  const [mounted, setMounted] = useState(false);
   const { toggleSidebar } = useSidebar();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const currentTime = new Date();
 
   return (
     <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-8 border-b border-[#1f2937] mb-10">
@@ -28,10 +34,10 @@ export default function DashboardHeader({ title, subtitle, showSearch = true }: 
         </button>
         
         <div className="space-y-1">
-        <div className="flex items-center gap-2 mb-2">
+        <div className="flex items-center gap-2 mb-2 min-h-[22px]">
           <div className="w-1 h-1 rounded-full bg-[#1f2937]" />
           <span className="text-[15px] font-bold text-[#9ca3af] uppercase tracking-[0.1em]">
-            {format(currentTime, "d MMMM yyyy", { locale: tr })}
+            {mounted ? format(currentTime, "d MMMM yyyy", { locale: tr }) : "..."}
           </span>
         </div>
 
@@ -58,7 +64,7 @@ export default function DashboardHeader({ title, subtitle, showSearch = true }: 
           </div>
         )}
 
-        <div className="flex items-center gap-3 bg-[#111827] p-1.5 rounded-xl border border-[#1f2937]">
+        <div className="flex items-center gap-4 bg-[#111827] p-1.5 rounded-xl border border-[#1f2937]">
           <button className="w-9 h-9 rounded-lg flex items-center justify-center text-[#9ca3af] hover:text-white transition-colors relative group">
             <Bell size={18} />
             <div className="absolute top-2 right-2 w-1.5 h-1.5 bg-[#10a37f] rounded-full" />
