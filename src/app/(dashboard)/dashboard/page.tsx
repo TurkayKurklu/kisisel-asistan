@@ -63,7 +63,6 @@ export default function DashboardPage() {
     <div className="space-y-10 animate-chat-fade">
       <DashboardHeader
         title={`${getGreeting()}, Hoş Geldin`}
-        subtitle="Bugün harika şeyler başarmaya hazır mısın?"
       />
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -75,26 +74,26 @@ export default function DashboardPage() {
               label="Kalan Görevler"
               value={pendingTasks.length.toString()}
               icon={CheckCircle2}
-              trend="Fokusunu koru"
+              trend="Dikkatini Kaybetme"
               href="/tasks"
             />
             <StatCard
               label="Aylık Harcama"
               value={`₺${finance?.totalExpense.toLocaleString() || "0"}`}
               icon={Activity}
-              trend="Normal seyirde"
+              trend="Paranı Yönet"
               href="/finance"
             />
             <StatCard
               label="Etkinlikler"
               value={todayEvents.length.toString()}
               icon={Calendar}
-              trend="Bugün için"
+              trend="Zamanını Yönet"
               href="/calendar"
             />
           </section>
 
-          {/* Daily Workflow Section - ChatGPT Style List */}
+          {/* Daily Workflow Section -  Style List */}
           <section className="bg-[#111827] border border-[#1f2937] rounded-2xl overflow-hidden shadow-sm">
             <div className="p-6 border-b border-[#1f2937] flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -102,8 +101,8 @@ export default function DashboardPage() {
                   <Sparkles size={20} />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-[#e5e7eb]">Günlük Akış</h3>
-                  <p className="text-[11px] text-[#9ca3af] font-medium">Bütünsel iş akışınız ve etkinlikler</p>
+                  <h3 className="text-lg font-bold text-[#e5e7eb]">Günlük Planlar</h3>
+                  <p className="text-[11px] text-[#9ca3af] font-medium">Bugün için planladıkların</p>
                 </div>
               </div>
               <Link
@@ -121,7 +120,7 @@ export default function DashboardPage() {
                 </div>
               ) : (
                 [...pendingTasks.slice(0, 4), ...todayEvents.slice(0, 2)].map((item, i) => (
-                  <Link 
+                  <Link
                     key={i}
                     href={item.amount !== undefined ? "/finance" : (item.topic ? "/tasks" : "/calendar")}
                     className="flex items-center justify-between p-5 hover:bg-[#1f2937]/50 transition-all cursor-pointer group"
@@ -150,7 +149,7 @@ export default function DashboardPage() {
 
         {/* Right Column (4/12) */}
         <div className="lg:col-span-4 space-y-6">
-          {/* Finance Glance - ChatGPT Professional Look */}
+          {/* Finance Glance -  Professional Look */}
           <Link href="/finance" className="block group">
             <section className="bg-[#111827] border border-[#1f2937] p-8 rounded-2xl flex flex-col justify-between h-full group-hover:border-[#10a37f]/30 transition-all">
               <div className="space-y-8">
@@ -162,7 +161,7 @@ export default function DashboardPage() {
                     <ArrowUpRight size={18} />
                   </div>
                 </div>
-                
+
                 <div className="space-y-6">
                   <div>
                     <p className="text-[10px] font-bold text-[#9ca3af] uppercase tracking-[0.2em] mb-2">Mevcut Bakiye</p>
@@ -236,5 +235,5 @@ function StatCard({ label, value, icon: Icon, trend, href }: any) {
 }
 
 const ChevronRight = ({ size, className }: { size: number, className: string }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m9 18 6-6-6-6"/></svg>
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m9 18 6-6-6-6" /></svg>
 );

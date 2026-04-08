@@ -1,10 +1,10 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
-import { 
-  FileText, 
-  Search, 
-  Grid, 
+import {
+  FileText,
+  Search,
+  Grid,
   List as ListIcon,
   Trash2,
   Calendar as CalendarIcon,
@@ -59,27 +59,27 @@ export default function NotesPage() {
           }
         },
       },
-      cancel: { label: "İptal", onClick: () => {} }
+      cancel: { label: "İptal", onClick: () => { } }
     });
   };
 
-  const filteredNotes = notes.filter(n => 
-    n.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+  const filteredNotes = notes.filter(n =>
+    n.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     n.content.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
     <div className="space-y-10 animate-chat-fade">
-      <DashboardHeader 
-        title="Notlarım" 
-        subtitle="Önemli fikirlerinizi ChatGPT estetiğiyle organize edin."
+      <DashboardHeader
+        title="Notlarım"
+        subtitle="Kısa notlar alın"
         showSearch={false}
       />
 
       {/* Control Bar */}
       <section className="flex flex-col sm:flex-row items-center justify-between gap-6 pb-4">
         <div className="flex bg-[#111827] p-1.5 rounded-xl border border-[#1f2937] w-full sm:w-auto">
-          <button 
+          <button
             onClick={() => setViewMode("grid")}
             className={cn(
               "flex-1 px-5 py-2 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-2",
@@ -88,7 +88,7 @@ export default function NotesPage() {
           >
             <Grid size={14} /> Kılavuz
           </button>
-          <button 
+          <button
             onClick={() => setViewMode("list")}
             className={cn(
               "flex-1 px-5 py-2 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-2",
@@ -101,9 +101,9 @@ export default function NotesPage() {
 
         <div className="relative w-full sm:w-64">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9ca3af]/40" size={16} />
-          <input 
-            type="text" 
-            placeholder="Notlarda ara..." 
+          <input
+            type="text"
+            placeholder="Notlarda ara..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-10 pr-4 py-2.5 bg-[#111827] border border-[#1f2937] rounded-xl text-xs font-medium focus:outline-none focus:border-[#10a37f]/50 transition-all placeholder:text-[#9ca3af]/20"
@@ -126,16 +126,16 @@ export default function NotesPage() {
           </div>
         ) : (
           <div className={cn(
-            viewMode === "grid" 
-              ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" 
+            viewMode === "grid"
+              ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
               : "grid grid-cols-1 gap-3"
           )}>
             <AnimatePresence mode="popLayout">
               {filteredNotes.map((note, i) => (
-                <NoteItem 
-                  key={note.id} 
-                  note={note} 
-                  viewMode={viewMode} 
+                <NoteItem
+                  key={note.id}
+                  note={note}
+                  viewMode={viewMode}
                   onDelete={() => handleDelete(note.id)}
                   index={i}
                 />
@@ -152,7 +152,7 @@ export default function NotesPage() {
 
 function NoteItem({ note, viewMode, onDelete, index }: any) {
   const isGrid = viewMode === "grid";
-  
+
   // R2 Public URL resolver
   // Not: NEXT_PUBLIC_ öneki olmayan değişkenler client-side'da undefined döner.
   // Bu yüzden koda bir placeholder/fallback ekliyoruz.
@@ -190,7 +190,7 @@ function NoteItem({ note, viewMode, onDelete, index }: any) {
                 <FileText size={20} />
               </div>
             )}
-            
+
             <div className="min-w-0">
               <h4 className="text-md font-bold text-[#e5e7eb] truncate group-hover:text-[#10a37f] transition-colors leading-tight">
                 {note.title || "Adsız Not"}
@@ -203,21 +203,21 @@ function NoteItem({ note, viewMode, onDelete, index }: any) {
 
           {isGrid && (
             <div className="space-y-4">
-               {imageUrl && (
-                 <div className="w-full h-32 rounded-xl overflow-hidden border border-[#1f2937] shadow-inner">
-                    <img src={imageUrl} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                 </div>
-               )}
-               <p className="text-sm text-[#9ca3af] leading-relaxed line-clamp-3 whitespace-pre-wrap font-medium">
-                 {note.content}
-               </p>
+              {imageUrl && (
+                <div className="w-full h-32 rounded-xl overflow-hidden border border-[#1f2937] shadow-inner">
+                  <img src={imageUrl} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                </div>
+              )}
+              <p className="text-sm text-[#9ca3af] leading-relaxed line-clamp-3 whitespace-pre-wrap font-medium">
+                {note.content}
+              </p>
             </div>
           )}
         </div>
 
         <div className={cn("flex items-center justify-between", isGrid ? "pt-4 mt-auto border-t border-[#1f2937]" : "ml-auto")}>
           <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all">
-            <button 
+            <button
               onClick={(e) => { e.stopPropagation(); onDelete(); }}
               className="p-2 text-rose-500/60 hover:text-rose-500 transition-colors"
             >

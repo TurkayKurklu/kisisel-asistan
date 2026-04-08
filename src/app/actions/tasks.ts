@@ -21,7 +21,8 @@ export async function addTask(
   title?: string, 
   topic?: string,
   priority: string = "low",
-  dueDate?: Date
+  dueDate?: Date,
+  image?: string
 ) {
   try {
     const result = await db.task.create({
@@ -32,7 +33,8 @@ export async function addTask(
         title, 
         topic,
         priority: priority as any,
-        dueDate: dueDate ? new Date(dueDate) : null
+        dueDate: dueDate ? new Date(dueDate) : null,
+        image
       } as any,
     });
     revalidatePath("/dashboard");
@@ -67,7 +69,8 @@ export async function updateTask(
   date: Date, 
   time?: string, 
   title?: string, 
-  topic?: string
+  topic?: string,
+  image?: string
 ) {
   try {
     await db.task.update({
@@ -77,7 +80,8 @@ export async function updateTask(
         date: new Date(date), 
         time, 
         title, 
-        topic 
+        topic,
+        image
       } as any,
     });
     revalidatePath("/dashboard");

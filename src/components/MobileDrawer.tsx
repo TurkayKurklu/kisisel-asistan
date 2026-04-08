@@ -59,11 +59,11 @@ export default function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
               className="absolute top-0 left-0 w-[85%] h-full bg-[#020617] border-r border-[#1f2937] p-8 shadow-2xl flex flex-col"
             >
               <div className="flex justify-between items-center mb-12">
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 bg-[#10a37f] rounded-lg flex items-center justify-center text-white shadow-lg shadow-[#10a37f]/20">
-                    <Spark size={20} />
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 flex items-center justify-center shrink-0">
+                    <img src="/asistan-ana.png" alt="Logo" className="w-10 h-10 object-contain" />
                   </div>
-                  <span className="text-xl font-bold tracking-tight text-[#e5e7eb]">Aura Assistant</span>
+                  <span className="text-xl font-bold tracking-tight text-[#e5e7eb]">Kişisel Asistan</span>
                 </div>
                 <button 
                   onClick={onClose}

@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Clock, Type, AlignLeft, Sparkles, Loader2, Briefcase, Heart, ShoppingCart, Star, Zap, ChevronLeft, ChevronRight, ChevronDown, Send, Edit2 } from "lucide-react";
+import { X, Clock, Type, AlignLeft, Sparkles, Loader2, Briefcase, Heart, ShoppingCart, Star, Zap, ChevronLeft, ChevronRight, ChevronDown, Send, Edit2, Camera } from "lucide-react";
 import { addTask, updateTask } from "@/app/actions/tasks";
 import { cn } from "@/lib/utils";
 import Portal from "./Portal";
@@ -29,6 +29,7 @@ export default function TaskSheet({ isOpen, onClose, selectedDate, onSuccess, ed
   const [content, setContent] = useState("");
   const [time, setTime] = useState("12:00");
   const [topic, setTopic] = useState("work");
+  const [image, setImage] = useState("");
   const [isPending, setIsPending] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -38,11 +39,13 @@ export default function TaskSheet({ isOpen, onClose, selectedDate, onSuccess, ed
       setContent(editData.content || "");
       setTime(editData.time || "12:00");
       setTopic(editData.topic || "work");
+      setImage(editData.image || "");
     } else {
       setTitle("");
       setContent("");
       setTime("12:00");
       setTopic("work");
+      setImage("");
     }
   }, [editData, isOpen]);
 
@@ -56,10 +59,10 @@ export default function TaskSheet({ isOpen, onClose, selectedDate, onSuccess, ed
     setIsPending(true);
     try {
       if (editData) {
-        await updateTask(editData.id, content, selectedDate, time || undefined, title || undefined, topic);
+        await updateTask(editData.id, content, selectedDate, time || undefined, title || undefined, topic, image || undefined);
         toast.success("Görev başarıyla güncellendi.");
       } else {
-        await addTask(content, selectedDate, time || undefined, title || undefined, topic);
+        await addTask(content, selectedDate, time || undefined, title || undefined, topic, "low", undefined, image || undefined);
         toast.success("Görev başarıyla oluşturuldu.");
       }
       onClose();
@@ -80,12 +83,12 @@ export default function TaskSheet({ isOpen, onClose, selectedDate, onSuccess, ed
               initial={{ opacity: 0, scale: 0.95, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 10 }}
-              className="w-full max-w-[440px] bg-[#111827] border border-[#1f2937] rounded-3xl p-8 shadow-2xl relative"
+              className="w-full max-w-[440px] bg-[#111827] border border-[#1f2937] rounded-3xl p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto no-scrollbar"
             >
               <div className="flex justify-between items-center mb-8">
                 <div className="flex items-center gap-4">
                   <div className="w-10 h-10 bg-[#1f2937] rounded-xl flex items-center justify-center text-[#10a37f]">
-                    {editData ? <Edit2 size={18} /> : <Sparkles size={18} />}
+                    {editData ? <Edit2 size={18} /> : <Edit2 size={18} />}
                   </div>
                   <div>
                     <h2 className="text-xl font-bold text-[#e5e7eb]">{editData ? "Görevi Düzenle" : "Yeni Görev"}</h2>
@@ -128,6 +131,26 @@ export default function TaskSheet({ isOpen, onClose, selectedDate, onSuccess, ed
                       className="w-full bg-[#111827] border border-[#1f2937] rounded-xl px-4 py-4 text-sm text-[#e5e7eb] placeholder-[#9ca3af]/20 focus:outline-none focus:border-[#10a37f]/50 transition-all resize-none leading-relaxed font-medium"
                     />
                   </div>
+
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold text-[#9ca3af] uppercase tracking-widest ml-1 opacity-60 flex items-center gap-2">
+                       <Camera size={12} /> Görsel URL (Opsiyonel)
+                    </label>
+                    <div className="relative group">
+                      <input
+                        type="url"
+                        value={image}
+                        onChange={(e) => setImage(e.target.value)}
+                        placeholder="https://örnek.com/görsel.jpg"
+                        className="w-full bg-[#111827] border border-[#1f2937] rounded-xl px-4 py-3.5 text-xs font-medium text-[#e5e7eb] placeholder-[#9ca3af]/20 focus:outline-none focus:border-[#10a37f]/50 transition-all"
+                      />
+                      {image && (
+                        <div className="mt-4 w-full h-32 rounded-2xl overflow-hidden border border-[#1f2937] bg-[#020617]">
+                          <img src={image} alt="Önizleme" className="w-full h-full object-cover" />
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
 
                 <div className="space-y-6">
@@ -166,8 +189,8 @@ export default function TaskSheet({ isOpen, onClose, selectedDate, onSuccess, ed
                     <div className="flex items-center gap-3 bg-[#111827] border border-[#1f2937] p-1.5 rounded-2xl">
                       <div className="flex-1 flex gap-2">
                         <select 
-                          value={time.split(":")[0]}
-                          onChange={(e) => setTime(`${e.target.value.padStart(2, '0')}:${time.split(":")[1]}`)}
+                          value={time.split(":")[0] || "12"}
+                          onChange={(e) => setTime(`${e.target.value.padStart(2, '0')}:${time.split(":")[1] || "00"}`)}
                           className="flex-1 bg-[#1f2937] border border-[#1f2937] rounded-xl py-3 text-center text-lg font-bold text-[#e5e7eb] focus:outline-none appearance-none cursor-pointer"
                         >
                           {Array.from({ length: 24 }).map((_, i) => (
@@ -176,8 +199,8 @@ export default function TaskSheet({ isOpen, onClose, selectedDate, onSuccess, ed
                         </select>
                         <div className="flex items-center text-[#9ca3af]/40 font-bold">:</div>
                         <select 
-                          value={time.split(":")[1]}
-                          onChange={(e) => setTime(`${time.split(":")[0]}:${e.target.value.padStart(2, '0')}`)}
+                          value={time.split(":")[1] || "00"}
+                          onChange={(e) => setTime(`${time.split(":")[0] || "12"}:${e.target.value.padStart(2, '0')}`)}
                           className="flex-1 bg-[#1f2937] border border-[#1f2937] rounded-xl py-3 text-center text-lg font-bold text-[#e5e7eb] focus:outline-none appearance-none cursor-pointer"
                         >
                           {Array.from({ length: 12 }).map((_, i) => (

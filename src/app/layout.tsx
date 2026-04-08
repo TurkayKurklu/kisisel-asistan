@@ -8,13 +8,17 @@ import { Toaster } from "sonner";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Aura Asistan",
+  title: "Kişisel Asistan",
   description: "Zarif ve Modern Kişisel Asistan",
   manifest: "/manifest.json",
+  icons: {
+    icon: "/asistan-fav.png",
+    apple: "/asistan-fav.png",
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "Aura Asistan",
+    title: "Kişisel Asistan",
   },
 };
 
