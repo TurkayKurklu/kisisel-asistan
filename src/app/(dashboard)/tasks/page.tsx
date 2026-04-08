@@ -18,7 +18,8 @@ import {
   Type,
   AlignLeft,
   ChevronRight,
-  Circle
+  Circle,
+  Camera
 } from "lucide-react";
 import { format } from "date-fns";
 import { tr } from "date-fns/locale";
@@ -105,7 +106,7 @@ export default function TasksPage() {
       />
 
       {/* Control Bar */}
-      <section className="flex flex-col sm:flex-row items-center justify-between gap-6 pb-4">
+      <section className="flex flex-col sm:flex-row items-center justify-between gap-6 pb-4 px-2">
         <div className="flex bg-[#111827] p-1.5 rounded-xl border border-[#1f2937] w-full sm:w-auto">
           <button
             onClick={() => setViewMode("grid")}
@@ -148,13 +149,12 @@ export default function TasksPage() {
       </section>
 
       {/* Split View Tasks Area */}
-      <section className="grid grid-cols-1 lg:grid-cols-2 gap-10 pb-32">
+      <section className="grid grid-cols-1 lg:grid-cols-2 gap-10 pb-32 px-2">
         {/* Active Tasks Column */}
         <div className="space-y-6">
           <div className="flex items-center justify-between px-2">
             <div className="flex items-center gap-3">
-              <div className="w-2 h-2 rounded-full bg-[#10a37f]" />
-              <h3 className="text-sm font-bold text-[#e5e7eb] uppercase tracking-widest">Aktif Görevler</h3>
+              <h3 className="text-sm font-bold text-[#e5e7eb] uppercase tracking-widest pl-1">Aktif Görevler</h3>
             </div>
             <span className="text-[10px] font-bold text-[#9ca3af] bg-[#1f2937] px-2 py-0.5 rounded-md">{activeTasks.length}</span>
           </div>
@@ -192,8 +192,7 @@ export default function TasksPage() {
         <div className="space-y-6">
           <div className="flex items-center justify-between px-2 text-[#9ca3af]">
             <div className="flex items-center gap-3">
-              <div className="w-2 h-2 rounded-full bg-[#1f2937]" />
-              <h3 className="text-sm font-bold uppercase tracking-widest opacity-60">Tamamlananlar</h3>
+              <h3 className="text-sm font-bold uppercase tracking-widest opacity-60 pl-1">Tamamlananlar</h3>
             </div>
             <span className="text-[10px] font-bold bg-[#1f2937] px-2 py-0.5 rounded-md opacity-60">{completedTasks.length}</span>
           </div>
@@ -348,6 +347,12 @@ function TaskDetailModal({ task, onClose, onEdit, onDelete }: any) {
                 </div>
 
                 <div className="space-y-6">
+                  {task.image && (
+                    <div className="w-full h-48 rounded-3xl overflow-hidden border border-[#1f2937] shadow-lg">
+                      <img src={task.image} alt={task.title} className="w-full h-full object-cover" />
+                    </div>
+                  )}
+
                   <div className="space-y-2">
                     <div className="flex items-center gap-2 text-[#10a37f]">
                       <Type size={14} />
@@ -369,7 +374,7 @@ function TaskDetailModal({ task, onClose, onEdit, onDelete }: any) {
                       <AlignLeft size={14} />
                       <span className="text-[10px] font-bold uppercase tracking-widest opacity-40">Açıklama & Detay</span>
                     </div>
-                    <div className="bg-[#020617] p-6 rounded-[24px] border border-[#1f2937] text-sm text-[#e5e7eb] leading-relaxed font-medium whitespace-pre-wrap">
+                    <div className="bg-[#020617] p-6 rounded-[24px] border border-[#1f2937] text-sm text-[#e5e7eb] leading-relaxed font-medium whitespace-pre-wrap shadow-inner">
                       {task.content || "Detaylı açıklama bulunmuyor."}
                     </div>
                   </div>
