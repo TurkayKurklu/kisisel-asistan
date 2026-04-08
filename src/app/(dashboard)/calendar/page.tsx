@@ -83,7 +83,7 @@ export default function CalendarPage() {
   }
 
   return (
-    <div className="space-y-10 animate-chat-fade">
+    <div className="space-y-10 animate-chat-fade px-2 md:px-6">
       <DashboardHeader
         title="Takvim"
         subtitle="Görevlerinizi ve planlarınızı organize edin."
@@ -91,9 +91,9 @@ export default function CalendarPage() {
       />
 
       <div className="flex flex-col xl:flex-row gap-8 pb-32">
-        {/* Monthly Calendar Grid - Wider */}
-        <section className="flex-[3] flex flex-col gap-6 min-w-0">
-          <div className="bg-[#111827] border border-[#1f2937] p-2 sm:p-6 rounded-[2rem] shadow-sm overflow-hidden">
+        {/* Monthly Calendar Grid - Significantly Expanded */}
+        <section className="flex-[4] flex flex-col gap-6 min-w-0">
+          <div className="bg-[#111827] border border-[#1f2937] p-2 sm:p-6 rounded-[2.5rem] shadow-2xl overflow-hidden ring-1 ring-white/5">
             <MonthlyCalendar
               selectedDate={selectedDate}
               onDateSelect={(date: Date) => {
@@ -106,11 +106,11 @@ export default function CalendarPage() {
           </div>
         </section>
 
-        {/* Day Details & Actions - Slightly Narrower */}
-        <section className="flex-[1.2] space-y-6 min-w-0">
-          <div className="bg-[#020617] border border-[#1f2937] rounded-[2rem] p-8 space-y-8 min-h-[500px] flex flex-col sticky top-6">
-            <div className="flex flex-col gap-1.5">
-              <p className="text-[10px] font-bold text-[#9ca3af] uppercase tracking-[0.2em] opacity-40">Seçili Gün</p>
+        {/* Day Details & Actions - Compact Sidebar */}
+        <section className="flex-[1] space-y-6 min-w-0 lg:min-w-[320px]">
+          <div className="bg-[#020617] border border-[#1f2937] rounded-[2.5rem] p-8 space-y-8 min-h-[500px] flex flex-col sticky top-6 shadow-xl ring-1 ring-white/5">
+            <div className="flex flex-col gap-2">
+              <p className="text-[10px] font-bold text-[#10a37f] uppercase tracking-[0.2em] opacity-60">Seçili Gün</p>
               <h3 className="text-2xl font-bold tracking-tight text-[#e5e7eb]">
                 {format(selectedDate, "d MMMM yyyy", { locale: tr })}
               </h3>
@@ -119,24 +119,26 @@ export default function CalendarPage() {
             <div className="flex gap-3">
               <button
                 onClick={() => { setEditTaskData(null); setIsAddTaskOpen(true); }}
-                className="flex-1 flex items-center justify-center gap-2 px-6 py-4 bg-[#10a37f] text-white rounded-[1.25rem] text-xs font-bold shadow-lg shadow-[#10a37f]/10 hover:shadow-[#10a37f]/20 transition-all active:scale-95"
+                className="flex-1 flex items-center justify-center gap-3 px-6 py-5 bg-[#10a37f] text-white rounded-[1.25rem] text-xs font-bold shadow-xl shadow-[#10a37f]/20 hover:bg-[#10a37f]/90 transition-all active:scale-95 border border-[#10a37f]/50"
               >
-                <Plus size={16} /> Yeni Görev Ekle
+                <Plus size={18} /> Yeni Görev Ekle
               </button>
             </div>
 
-            <div className="flex-1 space-y-8 overflow-y-auto no-scrollbar">
+            <div className="flex-1 space-y-8 overflow-y-auto no-scrollbar pt-2">
               <div className="space-y-4">
                 <div className="flex items-center justify-between px-1">
-                  <h4 className="text-[10px] font-bold text-[#10a37f] uppercase tracking-widest">
+                  <h4 className="text-[10px] font-bold text-[#9ca3af] uppercase tracking-widest opacity-40">
                     GÖREVLER
                   </h4>
-                  <span className="text-[10px] font-bold text-[#9ca3af]/40">{filteredTasks.length} Kayıt</span>
+                  <span className="text-[10px] font-bold text-[#10a37f]">{filteredTasks.length} Kayıt</span>
                 </div>
                 {filteredTasks.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center py-12 border border-dashed border-[#1f2937] rounded-[2rem] gap-3">
-                    <Inbox size={24} className="text-[#9ca3af]/20" />
-                    <p className="text-[10px] text-[#9ca3af]/40 italic font-medium">Bu gün için görev bulunmuyor.</p>
+                  <div className="flex flex-col items-center justify-center py-16 border border-dashed border-[#1f2937] rounded-[2.5rem] gap-4 bg-[#111827]/30">
+                    <div className="w-12 h-12 rounded-full bg-[#111827] flex items-center justify-center text-[#9ca3af]/10 border border-[#1f2937]">
+                      <Inbox size={20} />
+                    </div>
+                    <p className="text-[10px] text-[#9ca3af]/40 italic font-bold">Harika! Bugün için görev bulunmuyor.</p>
                   </div>
                 ) : (
                   <div className="space-y-3">
@@ -245,7 +247,7 @@ function TaskDetailModal({ task, onClose, onEdit, onDelete }: any) {
                       <AlignLeft size={14} />
                       <span className="text-[10px] font-bold uppercase tracking-widest opacity-40">Açıklama & Detay</span>
                     </div>
-                    <div className="bg-[#020617] p-6 rounded-[24px] border border-[#1f2937] text-sm text-[#e5e7eb] width-relaxed font-medium whitespace-pre-wrap leading-relaxed">
+                    <div className="bg-[#020617] p-6 rounded-[24px] border border-[#1f2937] text-sm text-[#e5e7eb] font-medium whitespace-pre-wrap leading-relaxed shadow-inner">
                       {task.content || "Detaylı açıklama bulunmuyor."}
                     </div>
                   </div>
@@ -293,29 +295,29 @@ function MonthlyCalendar({ selectedDate, onDateSelect, entries }: { selectedDate
   });
 
   return (
-    <div className="space-y-8">
-      <div className="flex items-center justify-between px-2">
-        <div className="flex flex-col">
-          <h3 className="text-3xl font-bold tracking-tight text-[#e5e7eb]">
+    <div className="space-y-10">
+      <div className="flex items-center justify-between px-4">
+        <div className="flex flex-col gap-1">
+          <h3 className="text-4xl font-black tracking-tighter text-[#e5e7eb]">
             {format(currentMonth, "MMMM", { locale: tr })}
           </h3>
-          <p className="text-xs font-bold text-[#9ca3af] tracking-widest uppercase opacity-40">
+          <p className="text-xs font-bold text-[#10a37f] tracking-[0.3em] uppercase opacity-80">
             {format(currentMonth, "yyyy")}
           </p>
         </div>
-        <div className="flex gap-2 bg-[#111827] border border-[#1f2937] p-1.5 rounded-2xl">
-          <button onClick={prevMonth} className="w-10 h-10 rounded-xl flex items-center justify-center text-[#9ca3af] hover:bg-[#1f2937] hover:text-white transition-all">
-            <ChevronLeft size={20} />
+        <div className="flex gap-3 bg-[#020617] border border-[#1f2937] p-2 rounded-[1.25rem] shadow-inner">
+          <button onClick={prevMonth} className="w-11 h-11 rounded-xl flex items-center justify-center text-[#9ca3af] hover:bg-[#111827] hover:text-[#10a37f] transition-all border border-transparent hover:border-[#10a37f]/20 active:scale-90">
+            <ChevronLeft size={24} />
           </button>
-          <button onClick={nextMonth} className="w-10 h-10 rounded-xl flex items-center justify-center text-[#9ca3af] hover:bg-[#111827] hover:bg-[#1f2937] hover:text-white transition-all">
-            <ChevronRight size={20} />
+          <button onClick={nextMonth} className="w-11 h-11 rounded-xl flex items-center justify-center text-[#9ca3af] hover:bg-[#111827] hover:text-[#10a37f] transition-all border border-transparent hover:border-[#10a37f]/20 active:scale-90">
+            <ChevronRight size={24} />
           </button>
         </div>
       </div>
 
-      <div className="grid grid-cols-7 gap-px bg-[#1f2937] border border-[#1f2937] rounded-3xl overflow-hidden shadow-2xl">
+      <div className="grid grid-cols-7 gap-px bg-[#1f2937] border border-[#1f2937] rounded-[2rem] overflow-hidden shadow-2xl ring-1 ring-white/5">
         {['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'].map(d => (
-          <div key={d} className="bg-[#111827] text-center text-[10px] font-bold text-[#9ca3af]/40 uppercase tracking-[0.2em] py-5 border-b border-[#1f2937]">
+          <div key={d} className="bg-[#111827] text-center text-[10px] font-black text-[#9ca3af]/30 uppercase tracking-[0.25em] py-6 border-b border-[#1f2937]">
             {d}
           </div>
         ))}
@@ -330,34 +332,40 @@ function MonthlyCalendar({ selectedDate, onDateSelect, entries }: { selectedDate
               key={i}
               onClick={() => onDateSelect(day)}
               className={cn(
-                "min-h-[140px] p-3 flex flex-col items-start transition-all bg-[#020617] hover:bg-[#111827] relative group border-[#1f2937]/30 border-r border-b",
-                !isCurrentMonth && "opacity-20 pointer-events-none"
+                "min-h-[160px] p-4 flex flex-col items-start transition-all bg-[#020617] hover:bg-[#111827] relative group border-[#1f2937]/20 border-r border-b",
+                !isCurrentMonth && "opacity-20 pointer-events-none grayscale"
               )}
             >
               <div className={cn(
-                "w-8 h-8 flex items-center justify-center rounded-xl text-sm font-bold transition-all mb-2",
-                isSelected ? "bg-[#10a37f] text-white shadow-lg shadow-[#10a37f]/20" : isToday ? "text-[#10a37f] bg-[#10a37f]/10" : "text-[#e5e7eb]"
+                "w-9 h-9 flex items-center justify-center rounded-xl text-md font-black transition-all mb-4",
+                isSelected 
+                  ? "bg-[#10a37f] text-white shadow-xl shadow-[#10a37f]/30 scale-110" 
+                  : isToday 
+                    ? "text-[#10a37f] bg-[#10a37f]/10 ring-1 ring-[#10a37f]/20" 
+                    : "text-[#e5e7eb] group-hover:text-[#10a37f]"
               )}>
                 {format(day, "d")}
               </div>
 
-              <div className="flex flex-col gap-1.5 w-full overflow-hidden">
+              <div className="flex flex-col gap-2 w-full overflow-hidden">
                 {dayEntries.slice(0, 4).map((e: any, idx: number) => (
                   <div 
                     key={idx} 
                     className={cn(
-                      "text-[10px] px-2 py-1.5 rounded-lg truncate w-full font-bold border flex items-center gap-1.5",
+                      "text-[11px] px-3 py-2.5 rounded-xl truncate w-full font-black border flex items-center gap-2.5 shadow-sm transition-transform hover:scale-[1.02]",
                       e.isCompleted 
-                        ? "bg-[#1f2937]/50 text-[#9ca3af] border-transparent" 
-                        : "bg-[#10a37f]/10 text-[#10a37f] border-[#10a37f]/20"
+                        ? "bg-[#1f2937]/50 text-[#9ca3af] border-transparent opacity-60" 
+                        : "bg-[#10a37f]/20 text-[#10a37f] border-[#10a37f]/30"
                     )}
                   >
-                    {e.image && <Camera size={10} className="shrink-0" />}
-                    <span className="truncate">{e.title || e.content}</span>
+                    {e.image && <Camera size={12} className="shrink-0 text-[#10a37f]" />}
+                    <span className="truncate tracking-tight flex-1 text-left">{e.title || e.content}</span>
                   </div>
                 ))}
                 {dayEntries.length > 4 && (
-                  <p className="text-[9px] font-bold text-[#9ca3af] mt-1 ml-1 opacity-60">+{dayEntries.length - 4} görev daha</p>
+                  <p className="text-[10px] font-black text-[#10a37f] mt-1 ml-1 opacity-80 uppercase tracking-widest">
+                    +{dayEntries.length - 4} FAZLA
+                  </p>
                 )}
               </div>
             </button>
@@ -375,30 +383,30 @@ function CalendarItem({ title, time, category, completed, onClick }: { title: st
       animate={{ opacity: 1, y: 0 }}
       onClick={onClick}
       className={cn(
-        "group flex items-center justify-between p-5 bg-[#111827] border border-[#1f2937] rounded-2xl hover:border-[#10a37f]/30 hover:bg-[#111827]/80 transition-all cursor-pointer shadow-sm active:scale-[0.98]",
+        "group flex items-center justify-between p-6 bg-[#111827] border border-[#1f2937] rounded-[1.5rem] hover:border-[#10a37f]/40 hover:bg-[#111827]/80 transition-all cursor-pointer shadow-sm active:scale-[0.98] ring-1 ring-white/5",
         completed && "opacity-40"
       )}
     >
-      <div className="flex items-center gap-4 min-w-0 flex-1">
+      <div className="flex items-center gap-5 min-w-0 flex-1">
         <div className={cn(
-          "w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border border-[#1f2937] bg-[#020617]",
+          "w-11 h-11 rounded-xl flex items-center justify-center shrink-0 border border-[#1f2937] bg-[#020617] group-hover:border-[#10a37f]/30 transition-colors",
           "text-[#10a37f]"
         )}>
-          <CheckCircle2 size={18} />
+          <CheckCircle2 size={20} />
         </div>
         <div className="min-w-0 flex-1">
-          <h4 className={cn("text-sm font-bold text-[#e5e7eb] truncate leading-tight", completed && "line-through decoration-1")}>
+          <h4 className={cn("text-sm font-black text-[#e5e7eb] truncate leading-tight group-hover:text-white transition-colors", completed && "line-through decoration-2")}>
             {title}
           </h4>
-          <div className="flex items-center gap-3 mt-1.5 opacity-60">
-            <div className="flex items-center gap-1">
-              <Clock size={11} className="text-[#9ca3af]" />
-              <span className="text-[10px] font-bold text-[#9ca3af] uppercase tracking-wider">{time || "Tüm Gün"}</span>
+          <div className="flex items-center gap-4 mt-2 opacity-50">
+            <div className="flex items-center gap-1.5">
+              <Clock size={12} className="text-[#9ca3af]" />
+              <span className="text-[10px] font-black text-[#9ca3af] uppercase tracking-widest">{time || "TÜM GÜN"}</span>
             </div>
             {category && (
-              <div className="flex items-center gap-1">
-                <div className="w-1 h-1 rounded-full bg-[#1f2937]" />
-                <span className="text-[10px] font-bold text-[#9ca3af] uppercase tracking-wider">{category}</span>
+              <div className="flex items-center gap-2">
+                <div className="w-1 h-1 rounded-full bg-[#10a37f]" />
+                <span className="text-[10px] font-black text-[#9ca3af] uppercase tracking-widest">{category}</span>
               </div>
             )}
           </div>
