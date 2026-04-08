@@ -1,8 +1,10 @@
-# Dashboard Transformation Tasks
+# Dashboard Dönüşüm Görevleri
 
-- [x] **Database Setup**
-    - [x] Update `prisma/schema.prisma` with new models (`Event`, `Habit`) and extensions (`Task`, `Transaction`).
-    - [x] Run `npx prisma generate` and `npx prisma db push`.
+- [x] **Veritabanı ve Prisma Kurulumu (Fixed)**
+    - [x] `prisma/schema.prisma` dosyasının Prisma 7'ye göre güncellenmesi (url kaldırıldı, previewFeatures eklendi).
+    - [x] `src/lib/db.ts` dosyasının `PrismaPg` adapter ve singleton yapısına geçirilmesi.
+    - [x] `npx prisma generate` komutunun çalıştırılması ve istemcinin güncellenmesi.
+    - [x] Veritabanı bağlantısının test edilmesi (Başarılı).
 - [x] **Core Layout & Navigation**
     - [x] Create `src/app/(dashboard)/layout.tsx` (DashboardLayout).
     - [x] Create `src/components/Sidebar.tsx` (Desktop).
