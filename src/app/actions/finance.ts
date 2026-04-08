@@ -11,16 +11,15 @@ export async function addTransaction(
   title?: string
 ) {
   try {
-    const transactionData: any = { 
-      amount, 
-      description, 
-      category, 
-      type, 
-      title,
-      date: new Date()
-    };
     await (db.transaction.create as any)({
-      data: transactionData,
+      data: { 
+        amount: Number(amount), 
+        description, 
+        category, 
+        type, 
+        title,
+        date: new Date()
+      },
     });
     revalidatePath("/(dashboard)/finance");
     revalidatePath("/(dashboard)/dashboard");
@@ -42,7 +41,7 @@ export async function updateTransaction(
     await (db.transaction.update as any)({
       where: { id },
       data: { 
-        amount, 
+        amount: Number(amount), 
         description, 
         category, 
         type, 
@@ -88,7 +87,7 @@ export async function getFinanceSummary() {
       totalIncome: income,
       totalExpense: expense,
       balance: income - expense,
-      transactions: JSON.parse(JSON.stringify(transactions)) // Date serialization için
+      transactions: JSON.parse(JSON.stringify(transactions))
     };
   } catch (error) {
     console.error("Finans özeti hatası:", error);
