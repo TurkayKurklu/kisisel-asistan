@@ -2,6 +2,7 @@
 
 import { db } from "@/lib/db";
 import { revalidatePath } from "next/cache";
+import { Transaction } from "@prisma/client";
 
 export async function addTransaction(
   amount: number,
@@ -11,8 +12,15 @@ export async function addTransaction(
   title?: string
 ) {
   try {
-    await db.transaction.create({
-      data: { amount, description, category, type, title },
+    await (db.transaction.create as any)({
+      data: { 
+        amount, 
+        description, 
+        category, 
+        type, 
+        title,
+        date: new Date()
+      },
     });
     revalidatePath("/(dashboard)/finance");
     revalidatePath("/(dashboard)/dashboard");
@@ -31,9 +39,15 @@ export async function updateTransaction(
   title?: string
 ) {
   try {
-    await db.transaction.update({
+    await (db.transaction.update as any)({
       where: { id },
-      data: { amount, description, category, type, title },
+      data: { 
+        amount, 
+        description, 
+        category, 
+        type, 
+        title 
+      },
     });
     revalidatePath("/(dashboard)/finance");
     revalidatePath("/(dashboard)/dashboard");
@@ -48,8 +62,6 @@ export async function deleteTransaction(id: string) {
     await db.transaction.delete({
       where: { id },
     });
-    revalidatePath("/finance");
-    revalidatePath("/dashboard");
     revalidatePath("/(dashboard)/finance");
     revalidatePath("/(dashboard)/dashboard");
   } catch (error) {
@@ -63,18 +75,20 @@ export async function getFinanceSummary() {
     const transactions = await db.transaction.findMany({
       orderBy: { date: "desc" }
     });
+
     const income = transactions
-      .filter((t) => t.type === "INCOME")
-      .reduce((acc, t) => acc + t.amount, 0);
+      .filter((t: any) => t.type === "INCOME")
+      .reduce((acc: number, t: any) => acc + (Number(t.amount) || 0), 0);
+
     const expense = transactions
-      .filter((t) => t.type === "EXPENSE")
-      .reduce((acc, t) => acc + t.amount, 0);
-    
+      .filter((t: any) => t.type === "EXPENSE")
+      .reduce((acc: number, t: any) => acc + (Number(t.amount) || 0), 0);
+
     return {
       totalIncome: income,
       totalExpense: expense,
       balance: income - expense,
-      transactions: transactions
+      transactions: JSON.parse(JSON.stringify(transactions)) // Date serialization için
     };
   } catch (error) {
     console.error("Finans özeti hatası:", error);
@@ -95,7 +109,6 @@ export async function getChartData() {
 
     const dailyData: Record<string, { name: string, " gelir": number, " gider": number }> = {};
     
-    // Initialize last 7 days
     for (let i = 6; i >= 0; i--) {
       const d = new Date();
       d.setDate(d.getDate() - i);
@@ -103,17 +116,16 @@ export async function getChartData() {
       dailyData[dateStr] = { name: dateStr, " gelir": 0, " gider": 0 };
     }
 
-    transactions.forEach(t => {
+    transactions.forEach((t: any) => {
       const dateStr = new Date(t.date).toLocaleDateString("tr-TR", { weekday: "short" });
       if (dailyData[dateStr]) {
-        if (t.type === "INCOME") dailyData[dateStr][" gelir"] += t.amount;
-        else dailyData[dateStr][" gider"] += t.amount;
+        if (t.type === "INCOME") dailyData[dateStr][" gelir"] += Number(t.amount);
+        else dailyData[dateStr][" gider"] += Number(t.amount);
       }
     });
 
     return Object.values(dailyData);
   } catch (error) {
-    console.error("Chart data error:", error);
     return [];
   }
 }
