@@ -2,7 +2,6 @@
 
 import { db } from "@/lib/db";
 import { revalidatePath } from "next/cache";
-import { Transaction } from "@prisma/client";
 
 export async function addTransaction(
   amount: number,
@@ -12,15 +11,16 @@ export async function addTransaction(
   title?: string
 ) {
   try {
+    const transactionData: any = { 
+      amount, 
+      description, 
+      category, 
+      type, 
+      title,
+      date: new Date()
+    };
     await (db.transaction.create as any)({
-      data: { 
-        amount, 
-        description, 
-        category, 
-        type, 
-        title,
-        date: new Date()
-      },
+      data: transactionData,
     });
     revalidatePath("/(dashboard)/finance");
     revalidatePath("/(dashboard)/dashboard");
