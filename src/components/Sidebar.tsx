@@ -8,7 +8,9 @@ import {
   StickyNote,
   CheckSquare,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  TrendingUp,
+  X
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -21,6 +23,7 @@ const MENU_ITEMS = [
   { id: "finance", label: "Maliye", icon: Wallet, href: "/finance" },
   { id: "notes", label: "Notlar", icon: StickyNote, href: "/notes" },
   { id: "tasks", label: "Görevler", icon: CheckSquare, href: "/tasks" },
+  { id: "exchange-rates", label: "Döviz Kurları", icon: TrendingUp, href: "/exchange-rates" },
 ];
 
 export default function Sidebar() {

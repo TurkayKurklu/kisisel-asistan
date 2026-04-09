@@ -9,7 +9,8 @@ import {
   StickyNote, 
   CheckSquare,
   Sparkles,
-  ChevronRight
+  ChevronRight,
+  TrendingUp
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -18,7 +19,7 @@ import { cn } from "@/lib/utils";
 import Portal from "./Portal";
 
 // Fix for icon library name in previous turn
-import { LayoutDashboard as Dash, Calendar as Cal, Wallet as Wal, StickyNote as Note, CheckSquare as Check, Sparkles as Spark, ChevronRight as Right, X as Close } from "lucide-react";
+import { LayoutDashboard as Dash, Calendar as Cal, Wallet as Wal, StickyNote as Note, CheckSquare as Check, Sparkles as Spark, ChevronRight as Right, X as Close, TrendingUp as Trend } from "lucide-react";
 
 const MENU_ITEMS = [
   { id: "dashboard", label: "Dashboard", icon: Dash, href: "/dashboard" },
@@ -26,6 +27,7 @@ const MENU_ITEMS = [
   { id: "finance", label: "Maliye", icon: Wal, href: "/finance" },
   { id: "notes", label: "Notlar", icon: Note, href: "/notes" },
   { id: "tasks", label: "Görevler", icon: Check, href: "/tasks" },
+  { id: "exchange-rates", label: "Döviz Kurları", icon: Trend, href: "/exchange-rates" },
 ];
 
 interface MobileDrawerProps {
