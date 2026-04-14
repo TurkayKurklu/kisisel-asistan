@@ -289,9 +289,20 @@ function TaskItem({ task, viewMode, onToggle, onClick, index, isCompletedView }:
                 {task.topic || "Genel"}
               </span>
               <div className="flex items-center gap-1.5 opacity-40">
-                <CalendarIcon size={10} className="text-[#9ca3af]" />
                 <p className="text-[10px] font-bold text-[#9ca3af] uppercase">
-                  {format(new Date(task.date), "d MMM", { locale: tr })}
+                  {task.isRecurring ? (
+                    <span className="text-[#10a37f]">
+                      {task.recurrenceType === "weekdays" && "Hafta içi"}
+                      {task.recurrenceType === "weekly" && `Her ${format(new Date(task.date), "EEEE", { locale: tr })}`}
+                      {task.recurrenceType === "custom" && task.recurringDays && 
+                        task.recurringDays.split(",").map((d: string) => 
+                          ["Paz", "Pzt", "Sal", "Çar", "Per", "Cum", "Cmt"][parseInt(d)]
+                        ).join(", ")
+                      }
+                    </span>
+                  ) : (
+                    format(new Date(task.date), "d MMM", { locale: tr })
+                  )}
                 </p>
               </div>
             </div>
@@ -371,7 +382,15 @@ function TaskDetailModal({ task, onClose, onEdit, onDelete }: any) {
 
                   <div className="grid grid-cols-3 gap-6 py-8 border-y border-[#1f2937]">
                     <DetailField icon={Tag} label="Kategori" value={task.topic || "Genel"} />
-                    <DetailField icon={CalendarIcon} label="Tarih" value={format(new Date(task.date), "d MMM yyyy", { locale: tr })} />
+                    <DetailField 
+                      icon={CalendarIcon} 
+                      label="Tarih" 
+                      value={task.isRecurring ? (
+                        task.recurrenceType === "weekdays" ? "Hafta içi" :
+                        task.recurrenceType === "weekly" ? `Her ${format(new Date(task.date), "EEEE", { locale: tr })}` :
+                        task.recurringDays ? task.recurringDays.split(",").map((d: any) => ["Paz", "Pzt", "Sal", "Çar", "Per", "Cum", "Cmt"][parseInt(d)]).join(", ") : "Özel"
+                      ) : format(new Date(task.date), "d MMM yyyy", { locale: tr })} 
+                    />
                     <DetailField icon={Clock} label="Saat" value={task.time || "Belirtilmedi"} />
                   </div>
 

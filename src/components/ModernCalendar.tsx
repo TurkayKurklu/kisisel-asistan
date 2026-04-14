@@ -48,7 +48,29 @@ export default function ModernCalendar({ selectedDate, onDateSelect, tasks = [] 
           {days.map((day) => {
             const isSelected = isSameDay(day, selectedDate);
             const isTodayDate = isSameDay(day, today);
-            const dayTasks = tasks.filter(t => isSameDay(new Date(t.date), day));
+            
+            const dayTasks = tasks.filter(t => {
+              const taskDate = new Date(t.date);
+              if (isSameDay(taskDate, day)) return true;
+              
+              if (t.isRecurring) {
+                const dayOfWeek = day.getDay(); // 0=Sun, 1=Mon, ..., 6=Sat
+                
+                if (t.recurrenceType === "weekdays") {
+                  return dayOfWeek >= 1 && dayOfWeek <= 5;
+                }
+                
+                if (t.recurrenceType === "weekly") {
+                  return dayOfWeek === taskDate.getDay();
+                }
+                
+                if (t.recurrenceType === "custom" && t.recurringDays) {
+                  const days = t.recurringDays.split(",").map(Number);
+                  return days.includes(dayOfWeek);
+                }
+              }
+              return false;
+            });
 
             return (
               <motion.button

@@ -27,7 +27,10 @@ export async function addTask(
   topic?: string,
   priority: string = "low",
   dueDate?: Date | string,
-  image?: string
+  image?: string,
+  isRecurring?: boolean,
+  recurrenceType?: string,
+  recurringDays?: string
 ) {
   try {
     const taskDate = typeof date === 'string' ? new Date(date) : date;
@@ -46,6 +49,9 @@ export async function addTask(
         priority: priority as any,
         dueDate: taskDueDate,
         image,
+        isRecurring: !!isRecurring,
+        recurrenceType,
+        recurringDays,
         userId: session.user.id
       } as any,
     });
@@ -88,7 +94,10 @@ export async function updateTask(
   time?: string, 
   title?: string, 
   topic?: string,
-  image?: string
+  image?: string,
+  isRecurring?: boolean,
+  recurrenceType?: string,
+  recurringDays?: string
 ) {
   try {
     const taskDate = typeof date === 'string' ? new Date(date) : date;
@@ -104,7 +113,10 @@ export async function updateTask(
         time, 
         title, 
         topic,
-        image
+        image,
+        isRecurring: !!isRecurring,
+        recurrenceType,
+        recurringDays
       } as any,
     });
     

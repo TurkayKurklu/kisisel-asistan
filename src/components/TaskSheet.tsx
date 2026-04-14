@@ -65,6 +65,9 @@ export default function TaskSheet({ isOpen, onClose, selectedDate, onSuccess, ed
   const [date, setDate] = useState(format(selectedDate, "yyyy-MM-dd"));
   const [topic, setTopic] = useState("work");
   const [image, setImage] = useState<string | null>(null);
+  const [isRecurring, setIsRecurring] = useState(false);
+  const [recurrenceType, setRecurrenceType] = useState("none");
+  const [recurringDays, setRecurringDays] = useState<number[]>([]);
   const [isPending, setIsPending] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -77,6 +80,9 @@ export default function TaskSheet({ isOpen, onClose, selectedDate, onSuccess, ed
       setDate(format(new Date(editData.date), "yyyy-MM-dd"));
       setTopic(editData.topic || "work");
       setImage(editData.image || null);
+      setIsRecurring(editData.isRecurring || false);
+      setRecurrenceType(editData.recurrenceType || "none");
+      setRecurringDays(editData.recurringDays ? editData.recurringDays.split(",").map(Number) : []);
     } else {
       setTitle("");
       setContent("");
@@ -84,6 +90,9 @@ export default function TaskSheet({ isOpen, onClose, selectedDate, onSuccess, ed
       setDate(format(selectedDate, "yyyy-MM-dd"));
       setTopic("work");
       setImage(null);
+      setIsRecurring(false);
+      setRecurrenceType("none");
+      setRecurringDays([]);
     }
   }, [editData, isOpen, selectedDate]);
 
@@ -113,12 +122,37 @@ export default function TaskSheet({ isOpen, onClose, selectedDate, onSuccess, ed
 
     setIsPending(true);
     const finalDate = new Date(date);
+    const finalDays = recurringDays.length > 0 ? recurringDays.sort().join(",") : undefined;
+
     try {
       if (editData) {
-        await updateTask(editData.id, content, finalDate, time || undefined, title || undefined, topic, image || undefined);
+        await updateTask(
+          editData.id, 
+          content, 
+          finalDate, 
+          time || undefined, 
+          title || undefined, 
+          topic, 
+          image || undefined,
+          isRecurring,
+          recurrenceType,
+          finalDays
+        );
         toast.success("Görev başarıyla güncellendi.");
       } else {
-        await addTask(content, finalDate, time || undefined, title || undefined, topic, "low", undefined, image || undefined);
+        await addTask(
+          content, 
+          finalDate, 
+          time || undefined, 
+          title || undefined, 
+          topic, 
+          "low", 
+          undefined, 
+          image || undefined,
+          isRecurring,
+          recurrenceType,
+          finalDays
+        );
         toast.success("Görev başarıyla oluşturuldu.");
       }
       onClose();
@@ -268,38 +302,96 @@ export default function TaskSheet({ isOpen, onClose, selectedDate, onSuccess, ed
                     </div>
                   </div>
 
-                  <div className="space-y-3">
-                    <label className="text-[10px] font-bold text-[#9ca3af] uppercase tracking-widest ml-1 opacity-60 flex items-center gap-2">
-                       <Clock size={12} /> Planlanan Saat
-                    </label>
-                    <div className="flex items-center gap-3 bg-[#111827] border border-[#1f2937] p-1.5 rounded-2xl">
-                      <div className="flex-1 flex gap-2">
-                        <select 
-                          value={time.split(":")[0] || "12"}
-                          onChange={(e) => setTime(`${e.target.value.padStart(2, '0')}:${time.split(":")[1] || "00"}`)}
-                          className="flex-1 bg-[#1f2937] border border-[#1f2937] rounded-xl py-3 text-center text-lg font-bold text-[#e5e7eb] focus:outline-none appearance-none cursor-pointer"
-                        >
-                          {Array.from({ length: 24 }).map((_, i) => (
-                            <option key={i} value={i.toString().padStart(2, '0')}>{i.toString().padStart(2, '0')}</option>
-                          ))}
-                        </select>
-                        <div className="flex items-center text-[#9ca3af]/40 font-bold">:</div>
-                        <select 
-                          value={time.split(":")[1] || "00"}
-                          onChange={(e) => setTime(`${time.split(":")[0] || "12"}:${e.target.value.padStart(2, '0')}`)}
-                          className="flex-1 bg-[#1f2937] border border-[#1f2937] rounded-xl py-3 text-center text-lg font-bold text-[#e5e7eb] focus:outline-none appearance-none cursor-pointer"
-                        >
-                          {Array.from({ length: 12 }).map((_, i) => (
-                            <option key={i * 5} value={(i * 5).toString().padStart(2, '0')}>{(i * 5).toString().padStart(2, '0')}</option>
-                          ))}
-                        </select>
-                      </div>
-                      <div className="px-4 py-3 bg-[#111827] border border-[#1f2937] rounded-xl text-[#10a37f] font-bold text-[11px] uppercase tracking-widest">
-                        {time}
-                      </div>
-                    </div>
                   </div>
-                </div>
+
+                  {/* Recurrence Section */}
+                  <div className="space-y-4 pt-2 border-t border-[#1f2937]/50">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-lg bg-[#10a37f]/10 flex items-center justify-center text-[#10a37f]">
+                          <Clock size={14} />
+                        </div>
+                        <span className="text-xs font-bold text-[#e5e7eb]">Tekrarlayan Görev</span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setIsRecurring(!isRecurring)}
+                        className={cn(
+                          "w-12 h-6 rounded-full transition-all relative flex items-center px-1",
+                          isRecurring ? "bg-[#10a37f]" : "bg-[#1f2937]"
+                        )}
+                      >
+                        <motion.div
+                          animate={{ x: isRecurring ? 24 : 0 }}
+                          className="w-4 h-4 bg-white rounded-full shadow-sm"
+                        />
+                      </button>
+                    </div>
+
+                    <AnimatePresence>
+                      {isRecurring && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: "auto", opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          className="space-y-4 overflow-hidden"
+                        >
+                          <div className="grid grid-cols-1 gap-2">
+                            {[
+                              { id: "weekdays", label: "Hafta içi her gün" },
+                              { id: "weekly", label: "Her hafta bugün" },
+                              { id: "custom", label: "Özel Günler" }
+                            ].map((opt) => (
+                              <button
+                                key={opt.id}
+                                type="button"
+                                onClick={() => setRecurrenceType(opt.id)}
+                                className={cn(
+                                  "w-full px-4 py-3 rounded-xl text-[11px] font-bold transition-all border text-left flex items-center justify-between",
+                                  recurrenceType === opt.id 
+                                    ? "bg-[#10a37f]/10 border-[#10a37f]/30 text-[#10a37f]" 
+                                    : "bg-[#1f2937] border-transparent text-[#9ca3af] hover:border-[#1f2937]/50"
+                                )}
+                              >
+                                {opt.label}
+                                {recurrenceType === opt.id && <div className="w-1.5 h-1.5 rounded-full bg-[#10a37f]" />}
+                              </button>
+                            ))}
+                          </div>
+
+                          {recurrenceType === "custom" && (
+                            <div className="flex justify-between items-center gap-1.5 py-2">
+                              {["P", "P", "S", "Ç", "P", "C", "C"].map((day, idx) => {
+                                // 0=Sun, 1=Mon, ..., 6=Sat
+                                const dayLabels = ["Paz", "Pzt", "Sal", "Çar", "Per", "Cum", "Cmt"];
+                                const label = dayLabels[idx];
+                                const isSelected = recurringDays.includes(idx);
+                                return (
+                                  <button
+                                    key={idx}
+                                    type="button"
+                                    onClick={() => {
+                                      if (isSelected) setRecurringDays(recurringDays.filter(d => d !== idx));
+                                      else setRecurringDays([...recurringDays, idx]);
+                                    }}
+                                    className={cn(
+                                      "w-9 h-9 rounded-full flex items-center justify-center text-[10px] font-black transition-all border",
+                                      isSelected
+                                        ? "bg-[#10a37f] text-white border-[#10a37f]"
+                                        : "bg-[#111827] text-[#9ca3af] border-[#1f2937] hover:border-[#9ca3af]/30"
+                                    )}
+                                    title={label}
+                                  >
+                                    {day}
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          )}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
 
                 <button
                   type="submit"

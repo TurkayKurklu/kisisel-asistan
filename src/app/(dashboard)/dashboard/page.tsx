@@ -52,9 +52,35 @@ export default function DashboardPage() {
     fetchData();
   }, [fetchData]);
 
-  const pendingTasks = tasks.filter(t => !t.isCompleted);
+  const today = new Date();
+  
+  const pendingTasks = tasks.filter(t => {
+    if (t.isCompleted) return false;
+    
+    // One-off tasks: show if not completed
+    if (!t.isRecurring) return true;
+    
+    // Recurring tasks: show if they match today's day of week
+    const dayOfWeek = today.getDay(); // 0=Sun
+    const taskDate = new Date(t.date);
+    
+    if (t.recurrenceType === "weekdays") {
+      return dayOfWeek >= 1 && dayOfWeek <= 5;
+    }
+    
+    if (t.recurrenceType === "weekly") {
+      return dayOfWeek === taskDate.getDay();
+    }
+    
+    if (t.recurrenceType === "custom" && t.recurringDays) {
+      const days = t.recurringDays.split(",").map(Number);
+      return days.includes(dayOfWeek);
+    }
+    
+    return false;
+  });
+
   const todayEvents = events.filter(e => {
-    const today = new Date();
     const eventDate = new Date(e.date);
     return eventDate.getDate() === today.getDate() &&
       eventDate.getMonth() === today.getMonth() &&
@@ -119,7 +145,11 @@ export default function DashboardPage() {
                           <p className="text-sm font-bold text-[#e5e7eb] group-hover:text-white transition-colors truncate">{item.title || item.content}</p>
                           <div className="flex items-center gap-2 mt-0.5">
                             <p className="text-[10px] text-[#10a37f] font-bold uppercase tracking-wider opacity-80">
-                              {format(new Date(item.date), "d MMM", { locale: tr })}
+                              {item.isRecurring ? (
+                                item.recurrenceType === "weekdays" ? "Hafta içi" :
+                                item.recurrenceType === "weekly" ? `Her ${format(new Date(item.date), "EEEE", { locale: tr })}` :
+                                "Tekrarlayan"
+                              ) : format(new Date(item.date), "d MMM", { locale: tr })}
                             </p>
                             <span className="text-[10px] text-[#9ca3af]/20">•</span>
                             <p className="text-[10px] text-[#9ca3af] font-bold uppercase tracking-wider opacity-60">
