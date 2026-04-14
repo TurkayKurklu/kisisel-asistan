@@ -295,6 +295,12 @@ function TaskItem({ task, viewMode, onToggle, onClick, index, isCompletedView }:
                 </p>
               </div>
             </div>
+
+            {isGrid && task.content && task.content !== task.title && (
+              <p className="text-[11px] text-[#9ca3af] line-clamp-2 mt-2 font-medium opacity-80 leading-relaxed">
+                {task.content}
+              </p>
+            )}
           </div>
         </div>
 

@@ -25,6 +25,8 @@ import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { getLatestRates, getExchangeHistory } from "@/app/actions/exchange";
+import { format } from "date-fns";
+import { tr } from "date-fns/locale";
 
 export default function ExchangeRatesPage() {
   const [rates, setRates] = useState<any>(null);
@@ -160,12 +162,26 @@ export default function ExchangeRatesPage() {
                   </h2>
                 </div>
 
-                <div className="mt-8 pt-6 border-t border-[#1f2937]/50 flex items-center justify-between text-[#9ca3af]">
-                   <div className="flex items-center gap-2">
-                     <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                     <span className="text-[10px] font-bold uppercase tracking-widest">Global Veri</span>
+                 <div className="mt-8 pt-6 border-t border-[#1f2937]/50 flex flex-col gap-3">
+                   <div className="flex items-center justify-between text-[#9ca3af]">
+                     <div className="flex items-center gap-2">
+                       <div className={cn("w-2 h-2 rounded-full animate-pulse", 
+                        lastUpdated === new Date().toISOString().split('T')[0] ? "bg-emerald-500" : "bg-amber-500")} 
+                       />
+                       <span className="text-[10px] font-bold uppercase tracking-widest">
+                         {lastUpdated === new Date().toISOString().split('T')[0] ? 'Güncel Veri' : 'Dünkü Veri'}
+                       </span>
+                     </div>
+                     <span className="text-[10px] font-bold uppercase tracking-widest">
+                       {lastUpdated ? format(new Date(lastUpdated), "d MMMM yyyy", { locale: tr }) : 'Yükleniyor...'}
+                     </span>
                    </div>
-                   <span className="text-[10px] font-bold uppercase tracking-widest">{lastUpdated || 'Anlık'}</span>
+                   {lastUpdated !== new Date().toISOString().split('T')[0] && (
+                     <div className="flex items-center gap-2 text-amber-500/60 bg-amber-500/5 px-3 py-2 rounded-lg border border-amber-500/10">
+                       <Info size={12} />
+                       <p className="text-[9px] font-bold leading-none">Piyasalar henüz güncellenmedi, dünkü kapanış verileri gösteriliyor.</p>
+                     </div>
+                   )}
                 </div>
               </div>
             </motion.div>

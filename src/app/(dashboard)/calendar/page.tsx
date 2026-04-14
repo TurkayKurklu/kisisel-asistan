@@ -53,7 +53,7 @@ export default function CalendarPage() {
     }
   }, []);
 
-  const filteredTasks = tasks.filter(t => isSameDay(new Date(t.date), selectedDate));
+  const agendaTasks = [...tasks].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
   const handleDeleteTask = async (id: string) => {
     toast("Görevi silmek istediğinize emin misiniz?", {
@@ -110,9 +110,9 @@ export default function CalendarPage() {
         <section className="flex-[1] space-y-6 min-w-0 lg:min-w-[320px]">
           <div className="bg-[#020617] border border-[#1f2937] rounded-[1.5rem] md:rounded-[2.5rem] p-6 md:p-8 space-y-8 min-h-[400px] md:min-h-[500px] flex flex-col sticky top-6 shadow-xl ring-1 ring-white/5">
             <div className="flex flex-col gap-2">
-              <p className="text-[10px] font-bold text-[#10a37f] uppercase tracking-[0.2em] opacity-60">Seçili Gün</p>
+              <p className="text-[10px] font-bold text-[#10a37f] uppercase tracking-[0.2em] opacity-60">Ajanda</p>
               <h3 className="text-xl md:text-2xl font-bold tracking-tight text-[#e5e7eb]">
-                {format(selectedDate, "d MMMM yyyy", { locale: tr })}
+                Tüm Görevler
               </h3>
             </div>
 
@@ -129,24 +129,25 @@ export default function CalendarPage() {
               <div className="space-y-4">
                 <div className="flex items-center justify-between px-1">
                   <h4 className="text-[10px] font-bold text-[#9ca3af] uppercase tracking-widest opacity-40">
-                    GÖREVLER
+                    GÖREV LİSTESİ
                   </h4>
-                  <span className="text-[10px] font-bold text-[#10a37f]">{filteredTasks.length} Kayıt</span>
+                  <span className="text-[10px] font-bold text-[#10a37f]">{agendaTasks.length} Kayıt</span>
                 </div>
-                {filteredTasks.length === 0 ? (
+                {agendaTasks.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-12 md:py-16 border border-dashed border-[#1f2937] rounded-3xl md:rounded-[2.5rem] gap-4 bg-[#111827]/30">
                     <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#111827] flex items-center justify-center text-[#9ca3af]/10 border border-[#1f2937]">
                       <Inbox size={20} />
                     </div>
-                    <p className="text-[10px] text-[#9ca3af]/40 italic font-bold">Harika! Bugün için görev bulunmuyor.</p>
+                    <p className="text-[10px] text-[#9ca3af]/40 italic font-bold">Herhangi bir görev bulunmuyor.</p>
                   </div>
                 ) : (
                   <div className="space-y-3">
-                    {filteredTasks.map((task, i) => (
+                    {agendaTasks.map((task, i) => (
                       <CalendarItem
                         key={task.id}
                         title={task.title || task.content}
                         time={task.time}
+                        date={task.date}
                         category={task.topic}
                         completed={task.isCompleted}
                         onClick={() => setSelectedTask(task)}
@@ -393,7 +394,7 @@ function MonthlyCalendar({ selectedDate, onDateSelect, entries }: { selectedDate
   );
 }
 
-function CalendarItem({ title, time, category, completed, onClick }: { title: string, time?: string, category?: string, completed?: boolean, onClick?: any }) {
+function CalendarItem({ title, time, date, category, completed, onClick }: { title: string, time?: string, date?: string, category?: string, completed?: boolean, onClick?: any }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
@@ -416,6 +417,12 @@ function CalendarItem({ title, time, category, completed, onClick }: { title: st
             {title}
           </h4>
           <div className="flex items-center gap-3 md:gap-4 mt-1.5 md:mt-2 opacity-50">
+            <div className="flex items-center gap-1">
+              <CalendarIcon size={11} className="text-[#9ca3af]" />
+              <span className="text-[9px] md:text-[10px] font-bold text-[#9ca3af] uppercase tracking-widest">
+                {date ? format(new Date(date), "d MMM", { locale: tr }) : "BELİRSİZ"}
+              </span>
+            </div>
             <div className="flex items-center gap-1">
               <Clock size={11} className="text-[#9ca3af]" />
               <span className="text-[9px] md:text-[10px] font-black text-[#9ca3af] uppercase tracking-widest">{time || "TÜM GÜN"}</span>

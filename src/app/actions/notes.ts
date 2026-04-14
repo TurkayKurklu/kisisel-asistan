@@ -3,6 +3,7 @@
 import { db } from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import { uploadToR2 } from "./upload";
+import { auth } from "@/lib/auth";
 
 export async function createNote(title: string, content: string, image?: string) {
   try {
@@ -16,8 +17,11 @@ export async function createNote(title: string, content: string, image?: string)
       }
     }
 
+    const session = await auth();
+    if (!session?.user?.id) throw new Error("Unauthorized");
+
     await db.note.create({
-      data: { title, content, image: finalImageUrl },
+      data: { title, content, image: finalImageUrl, userId: session.user.id },
     });
     revalidatePath("/notes");
     revalidatePath("/(dashboard)/notes");
@@ -29,8 +33,11 @@ export async function createNote(title: string, content: string, image?: string)
 
 export async function deleteNote(id: string) {
   try {
+    const session = await auth();
+    if (!session?.user?.id) throw new Error("Unauthorized");
+
     await db.note.delete({
-      where: { id },
+      where: { id, userId: session.user.id },
     });
     revalidatePath("/notes");
     revalidatePath("/(dashboard)/notes");
@@ -51,8 +58,11 @@ export async function updateNote(id: string, title: string, content: string, ima
       }
     }
 
+    const session = await auth();
+    if (!session?.user?.id) throw new Error("Unauthorized");
+
     await db.note.update({
-      where: { id },
+      where: { id, userId: session.user.id },
       data: { title, content, image: finalImageUrl },
     });
     revalidatePath("/notes");
@@ -65,7 +75,11 @@ export async function updateNote(id: string, title: string, content: string, ima
 
 export async function getNotes() {
   try {
+    const session = await auth();
+    if (!session?.user?.id) return [];
+
     return await db.note.findMany({
+      where: { userId: session.user.id },
       orderBy: { createdAt: "desc" },
     });
   } catch (error) {

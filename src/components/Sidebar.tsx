@@ -16,6 +16,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useSidebar } from "./SidebarContext";
+import { useSession, signOut } from "next-auth/react";
+import { LogOut, User as UserIcon } from "lucide-react";
 
 const MENU_ITEMS = [
   { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, href: "/dashboard" },
@@ -29,6 +31,7 @@ const MENU_ITEMS = [
 export default function Sidebar() {
   const pathname = usePathname();
   const { isCollapsed, toggleSidebar } = useSidebar();
+  const { data: session } = useSession();
 
   return (
     <aside 
@@ -78,13 +81,45 @@ export default function Sidebar() {
         })}
       </nav>
 
-      <div className="p-4 border-t border-[#1f2937] flex justify-center">
-        <button 
-          onClick={toggleSidebar}
-          className="w-10 h-10 rounded-xl bg-[#111827] border border-[#1f2937] flex items-center justify-center text-[#9ca3af] hover:text-white hover:border-[#10a37f]/30 transition-all"
+      <div className="mt-auto border-t border-[#1f2937] px-3 py-4 space-y-2">
+        <div className={cn(
+          "flex items-center gap-3 px-3 py-3 rounded-xl bg-[#111827]/50 border border-[#1f2937]/50 mb-2",
+          isCollapsed && "justify-center px-0"
+        )}>
+           <div className="w-8 h-8 rounded-lg bg-[#1f2937] flex items-center justify-center text-[#10a37f] shrink-0 border border-[#10a37f]/20">
+              <UserIcon size={16} />
+           </div>
+           {!isCollapsed && (
+             <div className="min-w-0 flex-1">
+                <p className="text-[11px] font-bold text-[#e5e7eb] truncate">
+                  {session?.user?.name || session?.user?.email || "Kullanıcı"}
+                </p>
+                <p className="text-[9px] font-medium text-[#9ca3af] truncate opacity-60 capitalize">
+                  {session?.user?.id?.slice(0, 8)}...
+                </p>
+             </div>
+           )}
+        </div>
+
+        <button
+          onClick={() => signOut({ callbackUrl: "/login" })}
+          className={cn(
+            "w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium text-rose-500/80 hover:bg-rose-500/10 hover:text-rose-500 transition-all group",
+            isCollapsed && "justify-center px-0"
+          )}
         >
-          {isCollapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
+          <LogOut size={20} className="shrink-0" />
+          {!isCollapsed && <span>Çıkış Yap</span>}
         </button>
+
+        <div className="flex justify-center pt-2">
+          <button 
+            onClick={toggleSidebar}
+            className="w-10 h-10 rounded-xl bg-[#111827] border border-[#1f2937] flex items-center justify-center text-[#9ca3af] hover:text-white hover:border-[#10a37f]/30 transition-all"
+          >
+            {isCollapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
+          </button>
+        </div>
       </div>
     </aside>
   );

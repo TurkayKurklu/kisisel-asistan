@@ -1,11 +1,15 @@
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
+import { Poppins } from "next/font/google";
 import "./globals.css";
 import PageAnimate from "@/components/PageAnimate";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { Toaster } from "sonner";
+import { SessionProvider } from "next-auth/react";
 
-const inter = Inter({ subsets: ["latin"] });
+const poppins = Poppins({ 
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700", "800", "900"]
+});
 
 export const metadata: Metadata = {
   title: "Kişisel Asistan",
@@ -58,13 +62,15 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className={`${inter.className} no-scrollbar antialiased transition-all duration-300`}>
-        <ThemeProvider>
-          <div className="relative min-h-screen">
-            <PageAnimate>{children}</PageAnimate>
-          </div>
-          <Toaster position="top-right" richColors />
-        </ThemeProvider>
+      <body className={`${poppins.className} no-scrollbar antialiased transition-all duration-300`}>
+        <SessionProvider>
+          <ThemeProvider>
+            <div className="relative min-h-screen">
+              <PageAnimate>{children}</PageAnimate>
+            </div>
+            <Toaster position="top-right" richColors />
+          </ThemeProvider>
+        </SessionProvider>
       </body>
     </html>
   );

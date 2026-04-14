@@ -232,7 +232,7 @@ function NoteItem({ note, viewMode, onDelete, onEdit, index }: any) {
         </div>
 
         <div className={cn("flex items-center justify-between", isGrid ? "pt-4 mt-auto border-t border-[#1f2937]" : "ml-auto")}>
-          <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all">
+          <div className="flex items-center gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all">
             <button
               onClick={(e) => { e.stopPropagation(); onEdit(); }}
               className="p-2 text-[#9ca3af] hover:text-[#10a37f] transition-colors"

@@ -2,11 +2,15 @@
 
 import { db } from "@/lib/db";
 import { revalidatePath } from "next/cache";
+import { auth } from "@/lib/auth";
 
 export async function addHabit(title: string) {
   try {
+    const session = await auth();
+    if (!session?.user?.id) throw new Error("Unauthorized");
+
     const habit = await db.habit.create({
-      data: { title, streak: 0 },
+      data: { title, streak: 0, userId: session.user.id },
     });
     revalidatePath("/habits");
     revalidatePath("/dashboard");
@@ -21,7 +25,11 @@ export async function addHabit(title: string) {
 
 export async function getHabits() {
   try {
+    const session = await auth();
+    if (!session?.user?.id) return [];
+
     return await db.habit.findMany({
+      where: { userId: session.user.id },
       orderBy: { createdAt: "desc" },
     });
   } catch (error) {
@@ -32,7 +40,12 @@ export async function getHabits() {
 
 export async function completeHabit(id: string) {
   try {
-    const habit = await db.habit.findUnique({ where: { id } });
+    const session = await auth();
+    if (!session?.user?.id) throw new Error("Unauthorized");
+
+    const habit = await db.habit.findUnique({ 
+      where: { id, userId: session.user.id } 
+    });
     if (!habit) throw new Error("Alışkanlık bulunamadı.");
 
     const now = new Date();
@@ -48,7 +61,7 @@ export async function completeHabit(id: string) {
     }
 
     const updated = await db.habit.update({
-      where: { id },
+      where: { id, userId: session.user.id },
       data: {
         streak: newStreak,
         lastCompletedDate: now,

@@ -2,6 +2,7 @@
 
 import { db } from "@/lib/db";
 import { revalidatePath } from "next/cache";
+import { auth } from "@/lib/auth";
 
 export async function addEvent(
   title: string,
@@ -10,12 +11,16 @@ export async function addEvent(
   category?: string
 ) {
   try {
+    const session = await auth();
+    if (!session?.user?.id) throw new Error("Unauthorized");
+
     const event = await db.event.create({
       data: {
         title,
         date,
         time,
         category,
+        userId: session.user.id,
       },
     });
     revalidatePath("/calendar");
@@ -31,7 +36,11 @@ export async function addEvent(
 
 export async function getEvents() {
   try {
+    const session = await auth();
+    if (!session?.user?.id) return [];
+
     return await db.event.findMany({
+      where: { userId: session.user.id },
       orderBy: { date: "asc" },
     });
   } catch (error) {
@@ -42,8 +51,11 @@ export async function getEvents() {
 
 export async function deleteEvent(id: string) {
   try {
+    const session = await auth();
+    if (!session?.user?.id) throw new Error("Unauthorized");
+
     await db.event.delete({
-      where: { id },
+      where: { id, userId: session.user.id },
     });
     revalidatePath("/calendar");
     revalidatePath("/dashboard");

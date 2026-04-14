@@ -2,6 +2,7 @@
 
 import { db } from "@/lib/db";
 import { revalidatePath } from "next/cache";
+import { auth } from "@/lib/auth";
 
 export async function addTransaction(
   amount: number,
@@ -11,6 +12,9 @@ export async function addTransaction(
   title?: string
 ) {
   try {
+    const session = await auth();
+    if (!session?.user?.id) throw new Error("Unauthorized");
+
     await (db.transaction.create as any)({
       data: { 
         amount: Number(amount), 
@@ -18,7 +22,8 @@ export async function addTransaction(
         category, 
         type, 
         title,
-        date: new Date()
+        date: new Date(),
+        userId: session.user.id
       },
     });
     revalidatePath("/(dashboard)/finance");
@@ -38,8 +43,11 @@ export async function updateTransaction(
   title?: string
 ) {
   try {
+    const session = await auth();
+    if (!session?.user?.id) throw new Error("Unauthorized");
+
     await (db.transaction.update as any)({
-      where: { id },
+      where: { id, userId: session.user.id },
       data: { 
         amount: Number(amount), 
         description, 
@@ -58,8 +66,11 @@ export async function updateTransaction(
 
 export async function deleteTransaction(id: string) {
   try {
+    const session = await auth();
+    if (!session?.user?.id) throw new Error("Unauthorized");
+
     await db.transaction.delete({
-      where: { id },
+      where: { id, userId: session.user.id },
     });
     revalidatePath("/(dashboard)/finance");
     revalidatePath("/(dashboard)/dashboard");
@@ -71,7 +82,11 @@ export async function deleteTransaction(id: string) {
 
 export async function getFinanceSummary() {
   try {
+    const session = await auth();
+    if (!session?.user?.id) return { totalIncome: 0, totalExpense: 0, balance: 0, transactions: [] };
+
     const transactions = await db.transaction.findMany({
+      where: { userId: session.user.id },
       orderBy: { date: "desc" }
     });
 
@@ -97,8 +112,12 @@ export async function getFinanceSummary() {
 
 export async function getChartData() {
   try {
+    const session = await auth();
+    if (!session?.user?.id) return [];
+
     const transactions = await db.transaction.findMany({
       where: {
+        userId: session.user.id,
         date: {
           gte: new Date(new Date().setDate(new Date().getDate() - 7))
         }

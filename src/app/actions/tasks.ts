@@ -2,10 +2,15 @@
 
 import { db } from "@/lib/db";
 import { revalidatePath } from "next/cache";
+import { auth } from "@/lib/auth";
 
 export async function getTasks() {
   try {
+    const session = await auth();
+    if (!session?.user?.id) return [];
+
     return await db.task.findMany({
+      where: { userId: session.user.id },
       orderBy: { date: "asc" },
     });
   } catch (error) {
@@ -28,6 +33,9 @@ export async function addTask(
     const taskDate = typeof date === 'string' ? new Date(date) : date;
     const taskDueDate = dueDate ? (typeof dueDate === 'string' ? new Date(dueDate) : dueDate) : null;
 
+    const session = await auth();
+    if (!session?.user?.id) throw new Error("Unauthorized");
+
     const result = await db.task.create({
       data: { 
         content, 
@@ -37,7 +45,8 @@ export async function addTask(
         topic,
         priority: priority as any,
         dueDate: taskDueDate,
-        image
+        image,
+        userId: session.user.id
       } as any,
     });
     
@@ -55,8 +64,11 @@ export async function addTask(
 
 export async function toggleTask(id: string, isCompleted: boolean) {
   try {
+    const session = await auth();
+    if (!session?.user?.id) throw new Error("Unauthorized");
+
     await db.task.update({
-      where: { id },
+      where: { id, userId: session.user.id },
       data: { isCompleted },
     });
     revalidatePath("/(dashboard)/calendar");
@@ -81,8 +93,11 @@ export async function updateTask(
   try {
     const taskDate = typeof date === 'string' ? new Date(date) : date;
 
+    const session = await auth();
+    if (!session?.user?.id) throw new Error("Unauthorized");
+
     await db.task.update({
-      where: { id },
+      where: { id, userId: session.user.id },
       data: { 
         content, 
         date: taskDate, 
@@ -107,8 +122,11 @@ export async function updateTask(
 
 export async function deleteTask(id: string) {
   try {
+    const session = await auth();
+    if (!session?.user?.id) throw new Error("Unauthorized");
+
     await db.task.delete({
-      where: { id },
+      where: { id, userId: session.user.id },
     });
     revalidatePath("/(dashboard)/calendar");
     revalidatePath("/calendar");
