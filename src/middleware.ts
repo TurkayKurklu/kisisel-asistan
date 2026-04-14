@@ -21,7 +21,8 @@ const middleware = auth((req) => {
   return NextResponse.next();
 });
 
-export { middleware as proxy };
+export default middleware;
+export { middleware, middleware as proxy };
 
 export const config = {
   matcher: ["/((?!.+\\.[\\w]+$|_next).*)", "/", "/(api|trpc)(.*)"],
