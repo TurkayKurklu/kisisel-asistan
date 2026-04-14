@@ -13,9 +13,10 @@ interface TransactionFormProps {
   onClose: () => void;
   onSuccess?: () => void;
   editData?: any;
+  isSavings?: boolean;
 }
 
-export default function TransactionForm({ isOpen, onClose, onSuccess, editData }: TransactionFormProps) {
+export default function TransactionForm({ isOpen, onClose, onSuccess, editData, isSavings = false }: TransactionFormProps) {
   const [isPending, setIsPending] = useState(false);
   const [amount, setAmount] = useState("");
   const [title, setTitle] = useState("");
@@ -39,6 +40,22 @@ export default function TransactionForm({ isOpen, onClose, onSuccess, editData }
     }
   }, [editData, isOpen]);
 
+  const handleAmountAdjust = (direction: "PLUS" | "MINUS") => {
+    const currentVal = parseFloat(amount) || 0;
+    let step = 1;
+
+    if (currentVal < 100) {
+      step = 1;
+    } else if (currentVal >= 100 && currentVal < 1000) {
+      step = 100;
+    } else {
+      step = 1000;
+    }
+
+    const newVal = direction === "PLUS" ? currentVal + step : Math.max(0, currentVal - step);
+    setAmount(newVal.toString());
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const numAmount = parseFloat(amount);
@@ -50,10 +67,10 @@ export default function TransactionForm({ isOpen, onClose, onSuccess, editData }
     setIsPending(true);
     try {
       if (editData) {
-        await updateTransaction(editData.id, numAmount, description, category, type, title);
+        await updateTransaction(editData.id, numAmount, description, category, type, title, isSavings);
         toast.success("İşlem başarıyla güncellendi.");
       } else {
-        await addTransaction(numAmount, description, category, type, title);
+        await addTransaction(numAmount, description, category, type, title, isSavings);
         toast.success("İşlem başarıyla kaydedildi.");
       }
       onClose();
@@ -125,18 +142,36 @@ export default function TransactionForm({ isOpen, onClose, onSuccess, editData }
                 {/* Amount Input */}
                 <div className="space-y-2">
                   <label className="text-[10px] font-bold text-[#9ca3af] uppercase tracking-widest ml-1 opacity-60">Tutar</label>
-                  <div className="relative group">
-                    <div className="absolute left-6 top-1/2 -translate-y-1/2 text-[#9ca3af]/20 font-bold text-3xl group-focus-within:text-[#10a37f] transition-colors">₺</div>
-                    <input
-                      type="number"
-                      step="0.01"
-                      placeholder="0.00"
-                      required
-                      autoFocus
-                      value={amount}
-                      onChange={(e) => setAmount(e.target.value)}
-                      className="w-full bg-[#111827] border border-[#1f2937] rounded-2xl pl-14 pr-6 py-6 text-4xl font-bold text-[#e5e7eb] placeholder-[#9ca3af]/10 focus:outline-none focus:border-[#10a37f]/50 transition-all text-center tracking-tighter"
-                    />
+                  <div className="relative group flex items-center gap-3">
+                    <button
+                      type="button"
+                      onClick={() => handleAmountAdjust("MINUS")}
+                      className="w-12 h-12 rounded-xl bg-[#1f2937] border border-[#1f2937] flex items-center justify-center text-rose-500 hover:bg-rose-500/10 hover:border-rose-500/30 transition-all shrink-0 active:scale-90"
+                    >
+                      <Minus size={20} />
+                    </button>
+                    
+                    <div className="relative flex-1 group/input">
+                      <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[#9ca3af]/20 font-bold text-xl group-focus-within/input:text-[#10a37f] transition-colors">₺</div>
+                      <input
+                        type="number"
+                        step="0.01"
+                        placeholder="0.00"
+                        required
+                        autoFocus
+                        value={amount}
+                        onChange={(e) => setAmount(e.target.value)}
+                        className="w-full bg-[#111827] border border-[#1f2937] rounded-2xl px-10 py-5 text-3xl font-black text-[#e5e7eb] placeholder-[#9ca3af]/10 focus:outline-none focus:border-[#10a37f]/50 transition-all text-center tracking-tighter"
+                      />
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => handleAmountAdjust("PLUS")}
+                      className="w-12 h-12 rounded-xl bg-[#1f2937] border border-[#1f2937] flex items-center justify-center text-emerald-500 hover:bg-emerald-500/10 hover:border-emerald-500/30 transition-all shrink-0 active:scale-90"
+                    >
+                      <Plus size={20} />
+                    </button>
                   </div>
                 </div>
 

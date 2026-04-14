@@ -261,7 +261,7 @@ export default function TaskSheet({ isOpen, onClose, selectedDate, onSuccess, ed
                   </div>
                 </div>
 
-                <div className="space-y-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-3">
                     <label className="text-[10px] font-bold text-[#9ca3af] uppercase tracking-widest ml-1 opacity-60 flex items-center gap-2">
                        <Calendar size={12} /> Planlanan Tarih
@@ -273,6 +273,39 @@ export default function TaskSheet({ isOpen, onClose, selectedDate, onSuccess, ed
                       className="w-full bg-[#111827] border border-[#1f2937] rounded-xl px-4 py-3.5 text-sm font-bold text-[#e5e7eb] focus:outline-none focus:border-[#10a37f]/50 transition-all cursor-pointer [color-scheme:dark]"
                     />
                   </div>
+
+                  <div className="space-y-3">
+                    <label className="text-[10px] font-bold text-[#9ca3af] uppercase tracking-widest ml-1 opacity-60 flex items-center gap-2">
+                       <Clock size={12} /> Planlanan Saat
+                    </label>
+                    <div className="flex items-center gap-2 bg-[#111827] border border-[#1f2937] rounded-xl px-2">
+                      <select 
+                        value={time.split(":")[0]}
+                        onChange={(e) => setTime(`${e.target.value}:${time.split(":")[1]}`)}
+                        className="bg-transparent py-3.5 text-sm font-bold text-[#e5e7eb] focus:outline-none appearance-none cursor-pointer px-2"
+                      >
+                        {Array.from({ length: 24 }, (_, i) => (
+                          <option key={i} value={i.toString().padStart(2, '0')} className="bg-[#111827]">
+                            {i.toString().padStart(2, '0')}
+                          </option>
+                        ))}
+                      </select>
+                      <span className="text-[#9ca3af]/40">:</span>
+                      <select 
+                        value={time.split(":")[1]}
+                        onChange={(e) => setTime(`${time.split(":")[0]}:${e.target.value}`)}
+                        className="bg-transparent py-3.5 text-sm font-bold text-[#e5e7eb] focus:outline-none appearance-none cursor-pointer px-2"
+                      >
+                        {Array.from({ length: 60 }, (_, i) => (
+                          <option key={i} value={i.toString().padStart(2, '0')} className="bg-[#111827]">
+                            {i.toString().padStart(2, '0')}
+                          </option>
+                        ))}
+                      </select>
+                      <Clock size={14} className="ml-auto mr-2 text-[#9ca3af]/20" />
+                    </div>
+                  </div>
+                </div>
 
                   <div className="space-y-3 relative group/topic">
                     <label className="text-[10px] font-bold text-[#9ca3af] uppercase tracking-widest ml-1 opacity-60">Kategori</label>
@@ -300,8 +333,6 @@ export default function TaskSheet({ isOpen, onClose, selectedDate, onSuccess, ed
                         ))}
                       </div>
                     </div>
-                  </div>
-
                   </div>
 
                   {/* Recurrence Section */}

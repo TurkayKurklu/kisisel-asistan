@@ -9,7 +9,8 @@ export async function addTransaction(
   description: string,
   category: string,
   type: "INCOME" | "EXPENSE",
-  title?: string
+  title?: string,
+  isSavings: boolean = false
 ) {
   try {
     const session = await auth();
@@ -22,6 +23,7 @@ export async function addTransaction(
         category, 
         type, 
         title,
+        isSavings,
         date: new Date(),
         userId: session.user.id
       },
@@ -40,7 +42,8 @@ export async function updateTransaction(
   description: string,
   category: string,
   type: "INCOME" | "EXPENSE",
-  title?: string
+  title?: string,
+  isSavings?: boolean
 ) {
   try {
     const session = await auth();
@@ -53,7 +56,8 @@ export async function updateTransaction(
         description, 
         category, 
         type, 
-        title 
+        title,
+        isSavings
       },
     });
     revalidatePath("/(dashboard)/finance");
@@ -80,13 +84,13 @@ export async function deleteTransaction(id: string) {
   }
 }
 
-export async function getFinanceSummary() {
+export async function getFinanceSummary(isSavings: boolean = false) {
   try {
     const session = await auth();
     if (!session?.user?.id) return { totalIncome: 0, totalExpense: 0, balance: 0, transactions: [] };
 
     const transactions = await db.transaction.findMany({
-      where: { userId: session.user.id },
+      where: { userId: session.user.id, isSavings },
       orderBy: { date: "desc" }
     });
 
@@ -110,7 +114,7 @@ export async function getFinanceSummary() {
   }
 }
 
-export async function getChartData() {
+export async function getChartData(isSavings: boolean = false) {
   try {
     const session = await auth();
     if (!session?.user?.id) return [];
@@ -118,6 +122,7 @@ export async function getChartData() {
     const transactions = await db.transaction.findMany({
       where: {
         userId: session.user.id,
+        isSavings,
         date: {
           gte: new Date(new Date().setDate(new Date().getDate() - 7))
         }

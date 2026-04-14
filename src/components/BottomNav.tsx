@@ -7,7 +7,8 @@ import {
   Wallet, 
   StickyNote, 
   CheckSquare,
-  TrendingUp
+  TrendingUp,
+  PiggyBank
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -19,6 +20,7 @@ const MENU_ITEMS = [
   { id: "finance", label: "Maliye", icon: Wallet, href: "/finance" },
   { id: "notes", label: "Notlar", icon: StickyNote, href: "/notes" },
   { id: "tasks", label: "Görevler", icon: CheckSquare, href: "/tasks" },
+  { id: "savings", label: "Kumbara", icon: PiggyBank, href: "/savings" },
   { id: "exchange-rates", label: "Kurlar", icon: TrendingUp, href: "/exchange-rates" },
 ];
 

@@ -304,6 +304,17 @@ function TaskItem({ task, viewMode, onToggle, onClick, index, isCompletedView }:
                     format(new Date(task.date), "d MMM", { locale: tr })
                   )}
                 </p>
+                {task.time && (
+                  <>
+                    <span className="text-[10px] text-[#9ca3af]/20">•</span>
+                    <div className="flex items-center gap-1.5 grayscale opacity-50">
+                      <Clock size={10} className="text-[#9ca3af]" />
+                      <p className="text-[10px] font-bold text-[#9ca3af]">
+                        {task.time}
+                      </p>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
 

@@ -101,6 +101,7 @@ model Transaction {
   category    String
   type        String   // "INCOME" or "EXPENSE"
   note        String?
+  isSavings   Boolean  @default(false)
   date        DateTime @default(now())
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
