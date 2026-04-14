@@ -17,6 +17,8 @@ import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import Portal from "./Portal";
+import { useSession, signOut } from "next-auth/react";
+import { LogOut, User as UserIcon } from "lucide-react";
 
 // Fix for icon library name in previous turn
 import { LayoutDashboard as Dash, Calendar as Cal, Wallet as Wal, StickyNote as Note, CheckSquare as Check, Sparkles as Spark, ChevronRight as Right, X as Close, TrendingUp as Trend } from "lucide-react";
@@ -37,6 +39,7 @@ interface MobileDrawerProps {
 
 export default function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
   const pathname = usePathname();
+  const { data: session } = useSession();
 
   return (
     <Portal>
@@ -101,10 +104,31 @@ export default function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
                 })}
               </nav>
 
-              <div className="mt-auto pt-8 border-t border-[#1f2937]">
-                <div className="p-6 bg-[#111827] rounded-3xl border border-[#1f2937] text-center group hover:border-[#10a37f]/20 transition-all">
-                   <p className="text-[10px] font-bold text-[#9ca3af]/30 uppercase tracking-[0.2em] mb-1">Aura AI v4</p>
-                   <p className="text-xs text-[#e5e7eb] font-bold">Profesyonel Mod Aktif</p>
+              <div className="mt-auto pt-6 border-t border-[#1f2937] space-y-4">
+                <div className="flex items-center gap-4 px-4 py-3 rounded-2xl bg-[#111827] border border-[#1f2937]">
+                   <div className="w-10 h-10 rounded-xl bg-[#1f2937] flex items-center justify-center text-[#10a37f] border border-[#10a37f]/20">
+                      <UserIcon size={20} />
+                   </div>
+                   <div className="min-w-0 flex-1">
+                      <p className="text-sm font-bold text-[#e5e7eb] truncate">
+                        {session?.user?.name || session?.user?.email || "Kullanıcı"}
+                      </p>
+                      <p className="text-[10px] font-medium text-[#9ca3af] truncate opacity-50">
+                        {session?.user?.id?.slice(0, 12)}...
+                      </p>
+                   </div>
+                </div>
+
+                <button
+                  onClick={() => signOut({ callbackUrl: "/login" })}
+                  className="w-full flex items-center gap-4 px-5 py-4 rounded-xl text-sm font-bold text-rose-500 bg-rose-500/5 border border-rose-500/10 active:scale-[0.98] transition-all"
+                >
+                  <LogOut size={18} />
+                  <span>Çıkış Yap</span>
+                </button>
+
+                <div className="p-4 text-center">
+                   <p className="text-[9px] font-bold text-[#9ca3af]/40 uppercase tracking-[0.3em]">Aura Assistant v4.2</p>
                 </div>
               </div>
             </motion.div>
