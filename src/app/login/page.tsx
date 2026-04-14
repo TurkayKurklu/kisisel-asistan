@@ -11,6 +11,7 @@ import { motion } from "framer-motion";
 export default function LoginPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
@@ -94,6 +95,18 @@ export default function LoginPage() {
                   className="w-full bg-[#161c2d]/50 border border-[#2b3348] rounded-2xl pl-12 pr-4 py-4 text-sm font-bold text-white focus:outline-none focus:border-[#10a37f]/50 transition-all placeholder:text-[#94a3b8]/20"
                 />
               </div>
+            </div>
+
+            <div className="flex items-center justify-between pl-1">
+              <label className="flex items-center gap-2 cursor-pointer group">
+                <input
+                  type="checkbox"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                  className="w-4 h-4 rounded border-[#2b3348] bg-[#161c2d]/50 text-[#10a37f] focus:ring-[#10a37f]/50 checked:bg-[#10a37f]"
+                />
+                <span className="text-xs font-bold text-[#94a3b8] group-hover:text-white transition-colors">Beni Hatırla</span>
+              </label>
             </div>
 
             <button
