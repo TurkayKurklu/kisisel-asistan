@@ -28,8 +28,9 @@ export async function addTransaction(
         userId: session.user.id
       },
     });
-    revalidatePath("/(dashboard)/finance");
-    revalidatePath("/(dashboard)/dashboard");
+    revalidatePath("/finance");
+    revalidatePath("/dashboard");
+    revalidatePath("/savings");
   } catch (error) {
     console.error("İşlem ekleme hatası:", error);
     throw new Error("İşlem eklenemedi.");
@@ -60,8 +61,9 @@ export async function updateTransaction(
         isSavings
       },
     });
-    revalidatePath("/(dashboard)/finance");
-    revalidatePath("/(dashboard)/dashboard");
+    revalidatePath("/finance");
+    revalidatePath("/dashboard");
+    revalidatePath("/savings");
   } catch (error) {
     console.error("İşlem güncelleme hatası:", error);
     throw new Error("İşlem güncellenemedi.");
@@ -76,37 +78,48 @@ export async function deleteTransaction(id: string) {
     await db.transaction.delete({
       where: { id, userId: session.user.id },
     });
-    revalidatePath("/(dashboard)/finance");
-    revalidatePath("/(dashboard)/dashboard");
+    revalidatePath("/finance");
+    revalidatePath("/dashboard");
+    revalidatePath("/savings");
   } catch (error) {
     console.error("İşlem silme hatası:", error);
     throw new Error("İşlem silinemedi.");
   }
 }
 
-export async function getFinanceSummary(isSavings: boolean = false) {
+export async function getFinanceSummary(isSavings: boolean = false, includeTransactions: boolean = true) {
   try {
     const session = await auth();
     if (!session?.user?.id) return { totalIncome: 0, totalExpense: 0, balance: 0, transactions: [] };
 
-    const transactions = await db.transaction.findMany({
+    // Get sums by type using database aggregation (much faster)
+    const stats = await db.transaction.groupBy({
+      by: ['type'],
       where: { userId: session.user.id, isSavings },
-      orderBy: { date: "desc" }
+      _sum: {
+        amount: true
+      }
     });
 
-    const income = transactions
-      .filter((t: any) => t.type === "INCOME")
-      .reduce((acc: number, t: any) => acc + (Number(t.amount) || 0), 0);
+    const income = stats.find(s => s.type === "INCOME")?._sum.amount || 0;
+    const expense = stats.find(s => s.type === "EXPENSE")?._sum.amount || 0;
 
-    const expense = transactions
-      .filter((t: any) => t.type === "EXPENSE")
-      .reduce((acc: number, t: any) => acc + (Number(t.amount) || 0), 0);
+    // Fetch transactions only if requested
+    let transactions: any[] = [];
+    if (includeTransactions) {
+      transactions = await db.transaction.findMany({
+        where: { userId: session.user.id, isSavings },
+        orderBy: { date: "desc" },
+        take: 50
+      });
+      transactions = JSON.parse(JSON.stringify(transactions));
+    }
 
     return {
       totalIncome: income,
       totalExpense: expense,
       balance: income - expense,
-      transactions: JSON.parse(JSON.stringify(transactions))
+      transactions
     };
   } catch (error) {
     console.error("Finans özeti hatası:", error);
@@ -119,19 +132,26 @@ export async function getChartData(isSavings: boolean = false) {
     const session = await auth();
     if (!session?.user?.id) return [];
 
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - 7);
+
     const transactions = await db.transaction.findMany({
       where: {
         userId: session.user.id,
         isSavings,
-        date: {
-          gte: new Date(new Date().setDate(new Date().getDate() - 7))
-        }
+        date: { gte: startDate }
+      },
+      select: {
+        amount: true,
+        type: true,
+        date: true
       },
       orderBy: { date: "asc" }
     });
 
     const dailyData: Record<string, { name: string, " gelir": number, " gider": number }> = {};
     
+    // Initialize days in one pass
     for (let i = 6; i >= 0; i--) {
       const d = new Date();
       d.setDate(d.getDate() - i);
@@ -139,16 +159,18 @@ export async function getChartData(isSavings: boolean = false) {
       dailyData[dateStr] = { name: dateStr, " gelir": 0, " gider": 0 };
     }
 
-    transactions.forEach((t: any) => {
+    transactions.forEach(t => {
       const dateStr = new Date(t.date).toLocaleDateString("tr-TR", { weekday: "short" });
       if (dailyData[dateStr]) {
-        if (t.type === "INCOME") dailyData[dateStr][" gelir"] += Number(t.amount);
-        else dailyData[dateStr][" gider"] += Number(t.amount);
+        const amt = Number(t.amount);
+        if (t.type === "INCOME") dailyData[dateStr][" gelir"] += amt;
+        else dailyData[dateStr][" gider"] += amt;
       }
     });
 
     return Object.values(dailyData);
   } catch (error) {
+    console.error("Grafik verisi hatası:", error);
     return [];
   }
 }

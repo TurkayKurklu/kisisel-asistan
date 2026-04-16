@@ -32,17 +32,11 @@ export async function uploadToR2(base64Data: string, fileName: string) {
 
     await s3Client.send(command);
 
-    // R2 endpoint'inden direk URL dönmek zordur (public subdomain lazım)
-    // Şimdilik sadece Key'i veya geçici bir URL yapısını döneceğiz.
-    // Kullanıcı r2.dev subdomain'ini tanımladığında bu URL tam çalışacaktır.
-    
-    // Cloudflare R2 Public URL yapısı genelde şöyledir:
-    // https://pub-xxxx.r2.dev/uniqueFileName
-    
+    // We now serve these files through /api/media/[key] to avoid R2 direct link issues.
     return {
       success: true,
       key: uniqueFileName,
-      url: uniqueFileName // Şimdilik sadece dosya adını dönüyoruz, UI tarafında BaseURL ile birleşecek
+      url: uniqueFileName 
     };
   } catch (error) {
     console.error("R2 Yükleme Hatası:", error);

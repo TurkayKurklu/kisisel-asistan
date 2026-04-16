@@ -181,7 +181,7 @@ export default function NoteSheet({ isOpen, onClose, onSuccess, editData }: Note
                       
                       {image ? (
                         <div className="relative w-full h-40 rounded-2xl overflow-hidden border border-[#1f2937] group bg-[#020617]">
-                          <img src={image.startsWith("data:") || image.startsWith("http") ? image : `${process.env.NEXT_PUBLIC_R2_URL}/${image}`} alt="Preview" className="w-full h-full object-cover" />
+                          <img src={image.startsWith("data:") || image.startsWith("http") ? image : `/api/media/${image}`} alt="Preview" className="w-full h-full object-cover" />
                           <button 
                             type="button"
                             onClick={() => setImage(null)}

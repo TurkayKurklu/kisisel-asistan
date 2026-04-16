@@ -21,7 +21,7 @@ import { format } from "date-fns";
 import { tr } from "date-fns/locale";
 import { motion, AnimatePresence } from "framer-motion";
 import { getFinanceSummary, deleteTransaction } from "@/app/actions/finance";
-import TransactionForm from "@/components/TransactionForm";
+import SavingsForm from "@/components/SavingsForm";
 import DashboardHeader from "@/components/DashboardHeader";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -88,16 +88,16 @@ export default function SavingsPage() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         {/* Left Column - Stats & Summary */}
         <div className="lg:col-span-4 space-y-6">
-          {/* Main Balance Card - Savings themed (Amber/Gold) */}
-          <div className="bg-[#111827] border border-amber-500/20 p-8 rounded-3xl relative overflow-hidden group shadow-2xl shadow-amber-500/5">
-            <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity text-amber-500">
+          {/* Main Balance Card - Savings themed (Primary Cyan) */}
+          <div className="bg-[#111827] border border-primary/20 p-8 rounded-3xl relative overflow-hidden group shadow-2xl shadow-primary/5">
+            <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity text-primary">
               <PiggyBank size={120} />
             </div>
             <div className="relative z-10 space-y-8">
               <div>
-                <p className="text-[10px] font-bold text-amber-500 uppercase tracking-[0.2em] mb-2">Toplam Birikim</p>
+                <p className="text-[10px] font-bold text-primary uppercase tracking-[0.2em] mb-2">Toplam Birikim</p>
                 <div className="flex items-baseline gap-2">
-                  <span className="text-2xl font-bold text-amber-500/30">₺</span>
+                  <span className="text-2xl font-bold text-primary/30">₺</span>
                   <h2 className="text-5xl font-bold tracking-tight text-[#e5e7eb]">
                     {summary?.balance.toLocaleString() || "0"}
                   </h2>
@@ -107,7 +107,7 @@ export default function SavingsPage() {
               <div className="grid grid-cols-2 gap-6 pt-8 border-t border-[#1f2937]/50">
                 <div className="space-y-1">
                   <p className="text-[9px] font-bold text-[#9ca3af] uppercase tracking-wider">Eklenen</p>
-                  <p className="text-lg font-bold text-amber-500">₺{summary ? (summary.totalIncome / 1000).toFixed(1) : "0"}k</p>
+                  <p className="text-lg font-bold text-primary">₺{summary ? (summary.totalIncome / 1000).toFixed(1) : "0"}k</p>
                 </div>
                 <div className="space-y-1">
                   <p className="text-[9px] font-bold text-[#9ca3af] uppercase tracking-wider">Çekilen</p>
@@ -117,7 +117,7 @@ export default function SavingsPage() {
 
               <button
                 onClick={() => { setEditData(null); setIsFormOpen(true); }}
-                className="w-full py-4 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-2xl text-xs uppercase tracking-widest transition-all shadow-xl shadow-amber-500/20 flex items-center justify-center gap-2"
+                className="w-full py-4 bg-primary hover:bg-primary/90 text-white font-bold rounded-2xl text-xs uppercase tracking-widest transition-all shadow-xl shadow-primary/20 flex items-center justify-center gap-2"
               >
                 <Plus size={16} /> Kumbara'ya Ekle
               </button>
@@ -144,7 +144,7 @@ export default function SavingsPage() {
                 placeholder="Kumbarada ara..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-12 pr-4 py-3.5 bg-[#020617] border border-[#1f2937] rounded-2xl text-sm font-medium focus:outline-none focus:border-amber-500/50 transition-all placeholder:text-[#9ca3af]/20"
+                className="w-full pl-12 pr-4 py-3.5 bg-[#020617] border border-[#1f2937] rounded-2xl text-sm font-medium focus:outline-none focus:border-primary/50 transition-all placeholder:text-[#9ca3af]/20"
               />
             </div>
           </div>
@@ -176,12 +176,11 @@ export default function SavingsPage() {
         </div>
       </div>
 
-      <TransactionForm
+      <SavingsForm
         isOpen={isFormOpen}
         onClose={() => setIsFormOpen(false)}
         onSuccess={fetchData}
         editData={editData}
-        isSavings={true} // Set isSavings: true
       />
 
       <DetailModal
@@ -210,7 +209,7 @@ function TransactionItem({ transaction, onClick }: any) {
       <div className="flex items-center gap-5 min-w-0">
         <div className={cn(
           "w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 border border-[#1f2937] shadow-sm",
-          isIncome ? "text-amber-500 bg-amber-500/5" : "text-rose-500 bg-rose-500/5"
+          isIncome ? "text-primary bg-primary/5" : "text-rose-500 bg-rose-500/5"
         )}>
           {isIncome ? <Plus size={20} /> : <X size={20} />}
         </div>
@@ -231,13 +230,13 @@ function TransactionItem({ transaction, onClick }: any) {
       <div className="text-right">
         <p className={cn(
           "text-lg font-bold tracking-tight",
-          isIncome ? "text-amber-500" : "text-[#e5e7eb]"
+          isIncome ? "text-primary" : "text-[#e5e7eb]"
         )}>
           {isIncome ? "+" : "-"}{transaction.amount.toLocaleString()} ₺
         </p>
         <div className="flex items-center justify-end gap-1 mt-1 opacity-0 group-hover:opacity-100 transition-all">
-          <span className="text-[9px] font-bold text-amber-500 uppercase tracking-widest">Detayı Gör</span>
-          <ChevronRight size={12} className="text-amber-500" />
+          <span className="text-[9px] font-bold text-primary uppercase tracking-widest">Detayı Gör</span>
+          <ChevronRight size={12} className="text-primary" />
         </div>
       </div>
     </motion.div>
@@ -261,19 +260,19 @@ function DetailModal({ transaction, onClose, onEdit, onDelete }: any) {
             >
               <div className={cn(
                 "absolute -top-24 -right-24 w-64 h-64 blur-[100px] opacity-20 rounded-full",
-                isIncome ? "bg-amber-500" : "bg-rose-500"
+                isIncome ? "bg-primary" : "bg-rose-500"
               )} />
 
               <div className="relative z-10 text-[#e5e7eb]">
                 <div className="flex justify-between items-start mb-10">
                   <div className={cn(
                     "w-16 h-16 rounded-[24px] flex items-center justify-center text-white border",
-                    isIncome ? "bg-amber-500 border-amber-400" : "bg-rose-500 border-rose-400"
+                    isIncome ? "bg-primary border-primary/20" : "bg-rose-500 border-rose-400"
                   )}>
                     <PiggyBank size={32} />
                   </div>
                   <div className="flex gap-3">
-                    <button onClick={() => onEdit(transaction)} className="p-3 bg-[#1f2937] rounded-2xl text-[#9ca3af] hover:text-amber-500 transition-all">
+                    <button onClick={() => onEdit(transaction)} className="p-3 bg-[#1f2937] rounded-2xl text-[#9ca3af] hover:text-primary transition-all">
                       <Edit2 size={20} />
                     </button>
                     <button onClick={() => onDelete(transaction.id)} className="p-3 bg-[#1f2937] rounded-2xl text-[#9ca3af] hover:text-rose-500 transition-all">
@@ -295,7 +294,7 @@ function DetailModal({ transaction, onClose, onEdit, onDelete }: any) {
                     <span className="text-2xl font-bold text-[#9ca3af]/40 mt-2">₺</span>
                     <h3 className={cn(
                       "text-6xl font-black tracking-tighter",
-                      isIncome ? "text-amber-500" : "text-[#e5e7eb]"
+                      isIncome ? "text-primary" : "text-[#e5e7eb]"
                     )}>
                       {transaction.amount.toLocaleString()}
                     </h3>

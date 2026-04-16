@@ -192,73 +192,90 @@ export default function ExchangeRatesPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="bg-[#111827] border border-[#1f2937] rounded-[32px] p-8"
+            className="bg-[#111827] border border-[#1f2937] rounded-[32px] p-8 shadow-xl"
           >
-            <div className="flex items-center justify-between mb-10">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-10">
               <div>
                 <h3 className="text-xl font-bold text-white flex items-center gap-3">
-                  <ChartIcon size={20} className="text-[#10a37f]" /> Değişim Grafiği
+                  <ChartIcon size={20} className="text-[#10a37f]" /> Piyasa Takibi
                 </h3>
-                <p className="text-sm text-[#9ca3af] mt-1">Son 7 günlük piyasa hareketleri.</p>
+                <p className="text-sm text-[#9ca3af] mt-1">Son 7 günlük USD ve EUR değişimleri (₺ bazlı).</p>
+              </div>
+              <div className="flex items-center gap-6 bg-[#020617] px-5 py-3 rounded-2xl border border-[#1f2937]">
+                <div className="flex items-center gap-2">
+                  <div className="w-2.5 h-2.5 rounded-full bg-[#10a37f] shadow-[0_0_10px_rgba(16,163,127,0.4)]" />
+                  <span className="text-[10px] font-bold text-[#e5e7eb] uppercase tracking-widest">USD</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-2.5 h-2.5 rounded-full bg-[#3b82f6] shadow-[0_0_10px_rgba(59,130,246,0.4)]" />
+                  <span className="text-[10px] font-bold text-[#e5e7eb] uppercase tracking-widest">EUR</span>
+                </div>
               </div>
             </div>
 
-            <div className="h-[300px] w-full">
+            <div className="h-[350px] w-full min-h-[350px] relative">
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={history}>
+                <AreaChart data={history} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                   <defs>
                     <linearGradient id="colorUsd" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#10a37f" stopOpacity={0.2}/>
+                      <stop offset="5%" stopColor="#10a37f" stopOpacity={0.15}/>
                       <stop offset="95%" stopColor="#10a37f" stopOpacity={0}/>
                     </linearGradient>
                     <linearGradient id="colorEur" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.2}/>
+                      <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.15}/>
                       <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" vertical={false} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" vertical={false} opacity={0.5} />
                   <XAxis 
                     dataKey="date" 
                     stroke="#4b5563" 
-                    fontSize={10} 
+                    fontSize={11} 
+                    fontWeight={600}
                     tickLine={false} 
                     axisLine={false}
-                    dy={10}
+                    dy={15}
                   />
                   <YAxis 
                     stroke="#4b5563" 
-                    fontSize={10} 
+                    fontSize={11} 
+                    fontWeight={600}
                     tickLine={false} 
                     axisLine={false} 
-                    domain={['auto', 'auto']}
+                    domain={['dataMin - 0.5', 'dataMax + 0.5']}
                     dx={-10}
-                    tickFormatter={(val) => `₺${val.toFixed(1)}`}
+                    tickFormatter={(val) => `₺${val.toFixed(2)}`}
                   />
                   <Tooltip 
                     contentStyle={{ 
                       backgroundColor: '#020617', 
                       borderColor: '#1f2937', 
-                      borderRadius: '16px',
+                      borderRadius: '20px',
                       fontSize: '12px',
-                      color: '#fff'
+                      color: '#fff',
+                      boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)',
+                      padding: '12px 16px'
                     }}
-                    itemStyle={{ color: '#fff' }}
+                    itemStyle={{ padding: '4px 0', fontSize: '13px', fontWeight: 'bold' }}
+                    cursor={{ stroke: '#1f2937', strokeWidth: 2 }}
                   />
                   <Area 
                     type="monotone" 
                     dataKey="USD" 
                     stroke="#10a37f" 
-                    strokeWidth={3}
+                    strokeWidth={4}
                     fillOpacity={1} 
                     fill="url(#colorUsd)" 
+                    activeDot={{ r: 6, strokeWidth: 0, fill: '#10a37f' }}
                   />
                   <Area 
                     type="monotone" 
                     dataKey="EUR" 
                     stroke="#3b82f6" 
-                    strokeWidth={3}
+                    strokeWidth={4}
                     fillOpacity={1} 
                     fill="url(#colorEur)" 
+                    activeDot={{ r: 6, strokeWidth: 0, fill: '#3b82f6' }}
                   />
                 </AreaChart>
               </ResponsiveContainer>

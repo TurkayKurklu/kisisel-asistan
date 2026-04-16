@@ -176,8 +176,8 @@ function NoteItem({ note, viewMode, onDelete, onEdit, index }: any) {
   const getImageUrl = (img: string) => {
     if (!img) return "";
     if (img.startsWith("data:") || img.startsWith("http")) return img;
-    const publicUrl = process.env.NEXT_PUBLIC_R2_URL || "";
-    return `${publicUrl}/${img}`;
+    // Use our media proxy instead of the direct R2 URL
+    return `/api/media/${img}`;
   };
 
   const imageUrl = getImageUrl(note.image);
