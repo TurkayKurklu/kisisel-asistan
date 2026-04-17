@@ -1,13 +1,13 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { 
-  PiggyBank, 
-  X, 
-  Loader2, 
-  Plus, 
-  Minus, 
-  Tag, 
+import {
+  PiggyBank,
+  X,
+  Loader2,
+  Plus,
+  Minus,
+  Tag,
   Send,
   Sparkles,
   TrendingUp
@@ -54,7 +54,7 @@ export default function SavingsForm({ isOpen, onClose, onSuccess, editData }: Sa
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Kumbara Form Verileri:", { amount, title, type, category });
-    
+
     const numAmount = parseFloat(amount);
     if (!numAmount || !title.trim()) {
       console.warn("Eksik bilgi: Tutar veya başlık girilmemiş.");
@@ -64,7 +64,7 @@ export default function SavingsForm({ isOpen, onClose, onSuccess, editData }: Sa
 
     setIsPending(true);
     const loadingToast = toast.loading("İşlem gerçekleştiriliyor...");
-    
+
     try {
       console.log("Sunucu eylemi başlatılıyor...");
       if (editData) {
@@ -105,8 +105,8 @@ export default function SavingsForm({ isOpen, onClose, onSuccess, editData }: Sa
                 <div className="flex items-center gap-5">
                   <div className={cn(
                     "w-14 h-14 rounded-2xl flex items-center justify-center border shadow-lg transition-all duration-500",
-                    type === "INCOME" 
-                      ? "bg-primary border-primary/20 text-white shadow-primary/20" 
+                    type === "INCOME"
+                      ? "bg-primary border-primary/20 text-white shadow-primary/20"
                       : "bg-[#1f2937] border-rose-500/30 text-rose-500 shadow-rose-500/5"
                   )}>
                     <PiggyBank size={28} className={cn(type === "INCOME" && "animate-bounce")} />
@@ -132,8 +132,8 @@ export default function SavingsForm({ isOpen, onClose, onSuccess, editData }: Sa
                     onClick={() => setType("INCOME")}
                     className={cn(
                       "flex items-center justify-center gap-2 py-3.5 rounded-[20px] text-[11px] font-black uppercase tracking-widest transition-all",
-                      type === "INCOME" 
-                        ? "bg-primary text-white shadow-xl shadow-primary/20" 
+                      type === "INCOME"
+                        ? "bg-primary text-white shadow-xl shadow-primary/20"
                         : "text-[#9ca3af] hover:text-white"
                     )}
                   >
@@ -144,8 +144,8 @@ export default function SavingsForm({ isOpen, onClose, onSuccess, editData }: Sa
                     onClick={() => setType("EXPENSE")}
                     className={cn(
                       "flex items-center justify-center gap-2 py-3.5 rounded-[20px] text-[11px] font-black uppercase tracking-widest transition-all",
-                      type === "EXPENSE" 
-                        ? "bg-rose-500 text-white shadow-xl shadow-rose-500/20" 
+                      type === "EXPENSE"
+                        ? "bg-rose-500 text-white shadow-xl shadow-rose-500/20"
                         : "text-[#9ca3af] hover:text-white"
                     )}
                   >
@@ -203,10 +203,10 @@ export default function SavingsForm({ isOpen, onClose, onSuccess, editData }: Sa
                   disabled={isPending}
                   className={cn(
                     "w-full py-6 rounded-[28px] font-black text-sm uppercase tracking-[0.2em] transition-all shadow-2xl flex items-center justify-center gap-3",
-                    isPending 
-                      ? "bg-[#1f2937] text-[#9ca3af] cursor-not-allowed" 
-                      : type === "INCOME" 
-                        ? "bg-primary hover:bg-primary/90 text-white shadow-primary/30" 
+                    isPending
+                      ? "bg-[#1f2937] text-[#9ca3af] cursor-not-allowed"
+                      : type === "INCOME"
+                        ? "bg-primary hover:bg-primary/90 text-white shadow-primary/30"
                         : "bg-rose-500 hover:bg-rose-600 text-white shadow-rose-500/30"
                   )}
                 >

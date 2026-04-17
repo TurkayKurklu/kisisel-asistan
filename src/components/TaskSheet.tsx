@@ -392,18 +392,23 @@ export default function TaskSheet({ isOpen, onClose, selectedDate, onSuccess, ed
 
                           {recurrenceType === "custom" && (
                             <div className="flex justify-between items-center gap-1.5 py-2">
-                              {["P", "P", "S", "Ç", "P", "C", "C"].map((day, idx) => {
-                                // 0=Sun, 1=Mon, ..., 6=Sat
-                                const dayLabels = ["Paz", "Pzt", "Sal", "Çar", "Per", "Cum", "Cmt"];
-                                const label = dayLabels[idx];
-                                const isSelected = recurringDays.includes(idx);
+                              {[
+                                { id: 1, label: "Pzt", short: "P" },
+                                { id: 2, label: "Sal", short: "S" },
+                                { id: 3, label: "Çar", short: "Ç" },
+                                { id: 4, label: "Per", short: "P" },
+                                { id: 5, label: "Cum", short: "C" },
+                                { id: 6, label: "Cmt", short: "C" },
+                                { id: 0, label: "Paz", short: "P" },
+                              ].map((day) => {
+                                const isSelected = recurringDays.includes(day.id);
                                 return (
                                   <button
-                                    key={idx}
+                                    key={day.id}
                                     type="button"
                                     onClick={() => {
-                                      if (isSelected) setRecurringDays(recurringDays.filter(d => d !== idx));
-                                      else setRecurringDays([...recurringDays, idx]);
+                                      if (isSelected) setRecurringDays(recurringDays.filter(d => d !== day.id));
+                                      else setRecurringDays([...recurringDays, day.id]);
                                     }}
                                     className={cn(
                                       "w-9 h-9 rounded-full flex items-center justify-center text-[10px] font-black transition-all border",
@@ -411,9 +416,9 @@ export default function TaskSheet({ isOpen, onClose, selectedDate, onSuccess, ed
                                         ? "bg-[#10a37f] text-white border-[#10a37f]"
                                         : "bg-[#111827] text-[#9ca3af] border-[#1f2937] hover:border-[#9ca3af]/30"
                                     )}
-                                    title={label}
+                                    title={day.label}
                                   >
-                                    {day}
+                                    {day.short}
                                   </button>
                                 );
                               })}

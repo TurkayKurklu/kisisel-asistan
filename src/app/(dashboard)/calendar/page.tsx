@@ -27,6 +27,36 @@ import DashboardHeader from "@/components/DashboardHeader";
 import { toast } from "sonner";
 import Portal from "@/components/Portal";
 
+const isTaskOnDay = (task: any, day: Date) => {
+  const taskDate = new Date(task.date);
+  
+  const d = new Date(day);
+  d.setHours(0, 0, 0, 0);
+  const td = new Date(taskDate);
+  td.setHours(0, 0, 0, 0);
+  
+  if (d < td) return false;
+
+  if (!task.isRecurring || task.recurrenceType === "none") {
+    return isSameDay(taskDate, day);
+  }
+
+  const dayOfWeek = day.getDay();
+
+  switch (task.recurrenceType) {
+    case "weekdays":
+      return dayOfWeek >= 1 && dayOfWeek <= 5;
+    case "weekly":
+      return dayOfWeek === taskDate.getDay();
+    case "custom":
+      if (!task.recurringDays) return false;
+      const days = task.recurringDays.split(",").map(Number);
+      return days.includes(dayOfWeek);
+    default:
+      return isSameDay(taskDate, day);
+  }
+};
+
 export default function CalendarPage() {
   const [mounted, setMounted] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -112,7 +142,7 @@ export default function CalendarPage() {
             <div className="flex flex-col gap-2">
               <p className="text-[10px] font-bold text-[#10a37f] uppercase tracking-[0.2em] opacity-60">Ajanda</p>
               <h3 className="text-xl md:text-2xl font-bold tracking-tight text-[#e5e7eb]">
-                Tüm Görevler
+                {format(selectedDate, "d MMMM yyyy", { locale: tr })}
               </h3>
             </div>
 
@@ -131,9 +161,9 @@ export default function CalendarPage() {
                   <h4 className="text-[10px] font-bold text-[#9ca3af] uppercase tracking-widest opacity-40">
                     GÖREV LİSTESİ
                   </h4>
-                  <span className="text-[10px] font-bold text-[#10a37f]">{agendaTasks.length} Kayıt</span>
+                  <span className="text-[10px] font-bold text-[#10a37f]">{tasks.filter(t => isTaskOnDay(t, selectedDate)).length} Kayıt</span>
                 </div>
-                {agendaTasks.length === 0 ? (
+                {tasks.filter(t => isTaskOnDay(t, selectedDate)).length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-12 md:py-16 border border-dashed border-[#1f2937] rounded-3xl md:rounded-[2.5rem] gap-4 bg-[#111827]/30">
                     <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#111827] flex items-center justify-center text-[#9ca3af]/10 border border-[#1f2937]">
                       <Inbox size={20} />
@@ -142,17 +172,20 @@ export default function CalendarPage() {
                   </div>
                 ) : (
                   <div className="space-y-3">
-                    {agendaTasks.map((task, i) => (
-                      <CalendarItem
-                        key={task.id}
-                        title={task.title || task.content}
-                        time={task.time}
-                        date={task.date}
-                        category={task.topic}
-                        completed={task.isCompleted}
-                        onClick={() => setSelectedTask(task)}
-                      />
-                    ))}
+                    {tasks
+                      .filter(t => isTaskOnDay(t, selectedDate))
+                      .sort((a, b) => (a.time || "00:00").localeCompare(b.time || "00:00"))
+                      .map((task, i) => (
+                        <CalendarItem
+                          key={task.id}
+                          title={task.title || task.content}
+                          time={task.time}
+                          date={format(selectedDate, "yyyy-MM-dd")}
+                          category={task.topic}
+                          completed={task.isCompleted}
+                          onClick={() => setSelectedTask(task)}
+                        />
+                      ))}
                   </div>
                 )}
               </div>
@@ -325,8 +358,8 @@ function MonthlyCalendar({ selectedDate, onDateSelect, entries }: { selectedDate
         {calendarDays.map((day, i) => {
           const isSelected = isSameDay(day, selectedDate);
           const isCurrentMonth = day.getMonth() === currentMonth.getMonth();
-          const dayEntries = entries.filter((e: any) => isSameDay(new Date(e.date), day));
           const isToday = isSameDay(day, new Date());
+          const dayEntries = entries.filter((e: any) => isTaskOnDay(e, day));
 
           return (
             <button
