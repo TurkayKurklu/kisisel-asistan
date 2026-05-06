@@ -39,7 +39,10 @@ export default function BottomNav({ onMenuClick }: BottomNavProps) {
   return (
     <>
       <nav className="md:hidden fixed bottom-6 left-4 right-4 z-50">
-        <div className="flex items-center justify-around p-1.5 bg-[#020617]/90 backdrop-blur-xl border border-[#1f2937] rounded-2xl shadow-2xl">
+        <div 
+          className="flex items-center p-1.5 bg-[#020617]/90 backdrop-blur-xl border border-[#1f2937] rounded-2xl shadow-2xl overflow-x-auto no-scrollbar"
+          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', WebkitOverflowScrolling: 'touch' }}
+        >
           {MENU_ITEMS.map((item) => {
             const isActive = pathname === item.href || pathname === `/(dashboard)${item.href}`;
             return (
@@ -47,7 +50,7 @@ export default function BottomNav({ onMenuClick }: BottomNavProps) {
                 key={item.id}
                 href={item.href}
                 className={cn(
-                  "flex flex-col items-center gap-1 p-2.5 rounded-xl transition-all duration-300 min-w-[50px]",
+                  "flex flex-col items-center gap-1 p-2.5 rounded-xl transition-all duration-300 min-w-[52px] flex-shrink-0",
                   isActive ? "text-[#10a37f] bg-[#10a37f]/5" : "text-[#9ca3af] hover:text-white"
                 )}
               >
@@ -56,7 +59,7 @@ export default function BottomNav({ onMenuClick }: BottomNavProps) {
                   strokeWidth={isActive ? 2.5 : 2}
                   className={cn("transition-transform duration-300", isActive && "scale-110")} 
                 />
-                <span className={cn("text-[8px] font-bold tracking-tight px-1", !isActive && "hidden")}>
+                <span className={cn("text-[8px] font-bold tracking-tight px-1 whitespace-nowrap", !isActive && "hidden")}>
                   {item.label}
                 </span>
               </Link>
@@ -66,7 +69,7 @@ export default function BottomNav({ onMenuClick }: BottomNavProps) {
           {/* Logout Button */}
           <button
             onClick={() => setShowLogoutConfirm(true)}
-            className="flex flex-col items-center gap-1 p-2.5 rounded-xl transition-all duration-300 text-rose-500/70 hover:text-rose-500 hover:bg-rose-500/5 min-w-[50px]"
+            className="flex flex-col items-center gap-1 p-2.5 rounded-xl transition-all duration-300 text-rose-500/70 hover:text-rose-500 hover:bg-rose-500/5 min-w-[52px] flex-shrink-0"
           >
             <LogOut size={18} strokeWidth={2} />
             <span className="hidden text-[8px] font-bold">Çıkış</span>
